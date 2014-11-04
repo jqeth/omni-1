@@ -39,7 +39,7 @@ class Metadata(message.Message, object):
 
 
 def metadata():
-    with open(path.join(path.dirname(__file__), "omnilib", "=META"), "rU",
+    with open(path.join(path.dirname(__file__), "omni", "META"), "rU",
             encoding="utf-8") as f:
         return parser.Parser(Metadata).parse(f)
 metadata = metadata()
@@ -64,5 +64,6 @@ setup(
     install_requires=metadata.requirements,
     license=metadata.license,
     classifiers=metadata.classifiers,
+    test_suite="omni.test",
     include_package_data=True,
 )
