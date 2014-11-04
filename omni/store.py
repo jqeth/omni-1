@@ -4,10 +4,10 @@
 #
 # Copyright © 2014 Adrian Perez <aperez@igalia.com>
 #
-# Distributed under terms of the MIT license.
+# Distributed under terms of the GPLv3 license.
 
 """
-
+Credential store definition and related utilities.
 """
 
 from . import auth
