@@ -66,4 +66,9 @@ setup(
     classifiers=metadata.classifiers,
     test_suite="omni.test",
     include_package_data=True,
+    entry_points={
+        "console_scripts": [
+            "omnid = omni.omnid:main",
+        ],
+    },
 )
