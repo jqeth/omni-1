@@ -8,6 +8,7 @@ Authors:
 Requirements:
 	six>=1.8.0
 	wcfg>=4
+	WebOb>=1.4
 Test-Requirements:
 	green>=1.7.0
 Classifiers:

@@ -11,6 +11,8 @@ Command line entry point for the OMNI daemon.
 """
 
 from omni import store
+from omni import restish
+from wsgiref.simple_server import make_server
 import wcfg
 
 
@@ -31,9 +33,14 @@ def main():
 
     for name, realm_config in iteritems(config.get("realms", {})):
         methods = realm_config["methods"]
-        realm = store.Realm((app.get_store(name) for name in methods))
+        realm = store.Realm(str(realm_config.get("description", name)),
+                (app.get_store(name) for name in methods))
         app.add_realm(name, realm)
         print("Realm {} registered:".format(name), realm)
+
+    wsgi_app = make_server("localhost", 8080, restish.Router(app))
+    wsgi_app.serve_forever()
+
 
 if __name__ == "__main__":
     main()

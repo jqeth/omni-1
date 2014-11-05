@@ -28,6 +28,10 @@ class Realm(Authenticator, list):
     """
     A realm is a list of `Authenticator` objects which are tried in order.
     """
+    def __init__(self, description, *arg):
+        super(Realm, self).__init__(*arg)
+        self.description = description
+
     def authenticate(self, username, password):
         for a in self:
             if a.authenticate(username, password):
