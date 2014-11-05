@@ -40,7 +40,7 @@ def main():
     import sys
     from six import iteritems
 
-    with open(sys.argv[1], "rU") as f:
+    with open(sys.argv[1], "rb") as f:
         config = wcfg.load(f)
 
     app = OMNI()

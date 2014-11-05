@@ -7,7 +7,7 @@ Authors:
 	Adrián Pérez de Castro <aperez@igalia.com>
 Requirements:
 	six>=1.8.0
-	wcfg>=2
+	wcfg>=4
 Test-Requirements:
 	green>=1.7.0
 Classifiers:
