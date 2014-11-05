@@ -20,7 +20,6 @@ class Router(object):
         self._omni = omni
 
     def do_auth(self, request, realm):
-        print("do_auth OK", realm)
         request.response.content_type = "text/plain"
         request.response.write("OK")
 
