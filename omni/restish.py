@@ -12,6 +12,7 @@ Exposes a REST-ish authentication interface to OMNI.
 
 from webob.exc import HTTPNotFound, HTTPUnauthorized
 from webob.dec import wsgify
+import base64
 
 
 class Router(object):
@@ -46,7 +47,11 @@ class Router(object):
 
         if requires_authentication:
             # Requires being already authenticated.
-            username, password = request.authorization or (None, None)
+            username = None
+            password = None
+            if request.authorization:
+                password = base64.b64decode(request.authorization[1])
+                username, password = password.decode("utf-8").split(":", 1)
             if username is None or not realm.authenticate(username, password):
                 raise HTTPUnauthorized(headers=[
                     ("WWW-Authenticate",
