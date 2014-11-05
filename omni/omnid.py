@@ -10,30 +10,8 @@
 Command line entry point for the OMNI daemon.
 """
 
-import omni.store
-import omni.auth
+from omni import store
 import wcfg
-
-
-class OMNI(object):
-    def __init__(self):
-        self._stores = {}
-        self._realms = {}
-
-    def add_store(self, name, store):
-        if name in self._stores:
-            raise KeyError("Store {} is already present".format(name))
-        assert isinstance(store, omni.store.Base)
-        self._stores[name] = store
-
-    def add_realm(self, name, realm):
-        if name in self._realms:
-            raise KeyError("Realm {} is already present".format(name))
-        # TODO: assert isinstance(realm, omni.auth.Realm)
-        self._realms[name] = realm
-
-    def run(self):
-        pass
 
 
 def main():
@@ -43,11 +21,19 @@ def main():
     with open(sys.argv[1], "rb") as f:
         config = wcfg.load(f)
 
-    app = OMNI()
+    app = store.OMNI()
     for name, store_config in iteritems(config.get("stores", {})):
         store_type = name.split(".", 1)[0]
-        store = omni.store.find(store_type).from_config(store_config)
-        app.add_store(name, store)
+        store_item = store.find(store_type).from_config(store_config)
+        app.add_store(name, store_item)
+        print("Store {} registered (type: {}), config:".format(name,
+            store_type), store_config)
+
+    for name, realm_config in iteritems(config.get("realms", {})):
+        methods = realm_config["methods"]
+        realm = store.Realm((app.get_store(name) for name in methods))
+        app.add_realm(name, realm)
+        print("Realm {} registered:".format(name), realm)
 
 if __name__ == "__main__":
     main()
