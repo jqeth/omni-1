@@ -21,6 +21,10 @@ class Metadata(message.Message, object):
     @staticmethod
     def get_multiline(content):
         return [line.strip() for line in content.splitlines() if line]
+    @staticmethod
+    def get_sub_keyed(content):
+        m = parser.Parser().parsestr(content.strip())
+        return dict((k, Metadata.get_multiline(m[k])) for k in m)
 
     description = property(lambda self: self["Description"])
     version = property(lambda self: self["Version"])
@@ -33,8 +37,10 @@ class Metadata(message.Message, object):
             self.get_author_field(self.authors[0], 2))
     test_requirements = property(lambda self:
             self.get_multiline(self["Test-Requirements"]))
+    extra_requirements = property(lambda self:
+            self.get_sub_keyed(self["Extra-Requirements"]))
     entry_points = property(lambda self:
-            self.multiline(self["Scripts"]))
+            self.get_multiline(self["Scripts"]))
     requirements = property(lambda self:
             self.get_multiline(self["Requirements"]))
     classifiers = property(lambda self:
@@ -73,5 +79,5 @@ if __name__ == "__main__":
         classifiers=metadata.classifiers,
         test_suite="omni.test",
         include_package_data=True,
-        entry_points=metadata.entry_points,
+        entry_points={ "console_scripts": metadata.entry_points },
     )
