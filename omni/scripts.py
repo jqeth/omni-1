@@ -13,8 +13,13 @@ Defines the entry points for command line utilities.
 def omnid():
     from omni import app
     import sys
-    import asyncio
     import aiowsgi
+
+    # Ugh. Trollius is used to implement asyncio in Python 2.x
+    try:
+        import asyncio
+    except ImportError:
+        import trollius as asyncio
 
     if "-h" in sys.argv or "--help" in sys.argv:
         raise SystemExit("Usage: omnid [path/to/omni.conf]")

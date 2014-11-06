@@ -12,6 +12,7 @@ from os import path
 from email import parser
 from email import message
 from re import match
+from codecs import open
 
 
 class Metadata(message.Message, object):
@@ -24,7 +25,7 @@ class Metadata(message.Message, object):
     @staticmethod
     def get_sub_keyed(content):
         m = parser.Parser().parsestr(content.strip())
-        return dict((k, Metadata.get_multiline(m[k])) for k in m)
+        return dict((k, Metadata.get_multiline(m[k])) for k in m.keys())
 
     description = property(lambda self: self["Description"])
     version = property(lambda self: self["Version"])
