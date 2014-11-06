@@ -18,6 +18,7 @@ from .. import store
 from six import iteritems, iterkeys
 from codecs import open
 from collections import OrderedDict
+from hmac import compare_digest
 import crypt
 
 _crypt_methods = {}
@@ -123,7 +124,7 @@ class PlainStore(store.Base):
         with self._format(self._open_file, *self._fargs) as db:
             current = db[username]
             crypted = db.crypt_password(username, password, current)
-            return current == crypted
+            return compare_digest(current, crypted)
 
 
 def from_config(config):
