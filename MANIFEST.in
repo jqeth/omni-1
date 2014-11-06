@@ -1,2 +1,3 @@
+include examples/*.conf
 include README.rst
 include omni/META

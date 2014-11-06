@@ -9,6 +9,7 @@ Requirements:
 	six>=1.8.0
 	wcfg>=4
 	WebOb>=1.4
+	aiowsgi>=0.3
 Test-Requirements:
 	green>=1.7.0
 Classifiers:
