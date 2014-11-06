@@ -132,7 +132,7 @@ def from_config(config):
     if file_format == "plain":
         file_format = PlainFileFormat
         format_args = ()
-    elif file_format == "htpasswd":
+    elif file_format in ("htpasswd", "unix"):
         file_format = HtpasswdFileFormat
         crypt_method = _crypt_methods[config.get("method", "crypt")]
         format_args = (crypt_method,)
