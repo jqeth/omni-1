@@ -55,12 +55,12 @@ class uWSGIApplication(object):
     def __call__(self, environ, start_response):
         import uwsgi
         config_file_path = uwsgi.opt["omni_config_file"]
-        app = make_wsgi_application(config_file_path)
+        app = make_wsgi_application(load_config(config_file_path))
         # Replace the method itself, so make_wsgi_application()
         # is only called the first time, and the subsequent calls
         # go directly to the WSGI application itself.
         self.__call__ = app
-        return self(environ, start_response)
+        return app(environ, start_response)
 
 uwsgi_application = uWSGIApplication()
 
