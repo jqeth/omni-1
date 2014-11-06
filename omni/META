@@ -12,6 +12,8 @@ Requirements:
 	aiowsgi>=0.3
 Test-Requirements:
 	green>=1.7.0
+Scripts:
+	omnid:omni.scripts:omnid
 Classifiers:
 	Development Status :: 4 - Beta
 	Intended Audience :: Developers

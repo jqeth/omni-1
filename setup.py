@@ -18,8 +18,9 @@ class Metadata(message.Message, object):
     @staticmethod
     def get_author_field(name, field):
         return match(r"^([^<]+)\s+<([^>]*)>$", name).group(field)
-    def get_multiline(self, name):
-        return [line.strip() for line in self[name].splitlines() if line]
+    @staticmethod
+    def get_multiline(content):
+        return [line.strip() for line in content.splitlines() if line]
 
     description = property(lambda self: self["Description"])
     version = property(lambda self: self["Version"])
@@ -31,10 +32,14 @@ class Metadata(message.Message, object):
     main_author_email = property(lambda self:
             self.get_author_field(self.authors[0], 2))
     test_requirements = property(lambda self:
-            self.get_multiline("Test-Requirements"))
-    requirements = property(lambda self: self.get_multiline("Requirements"))
-    classifiers = property(lambda self: self.get_multiline("Classifiers"))
-    authors = property(lambda self: self.get_multiline("Authors"))
+            self.get_multiline(self["Test-Requirements"]))
+    entry_points = property(lambda self:
+            self.multiline(self["Scripts"]))
+    requirements = property(lambda self:
+            self.get_multiline(self["Requirements"]))
+    classifiers = property(lambda self:
+            self.get_multiline(self["Classifiers"]))
+    authors = property(lambda self: self.get_multiline(self["Authors"]))
 
 
 
@@ -51,24 +56,22 @@ def file_contents(*relpath):
         return f.read()
 
 
-setup(
-    name=metadata.package,
-    version=metadata.version,
-    description=metadata.description,
-    long_description=file_contents("README.rst"),
-    author=metadata.main_author_name,
-    author_email=metadata.main_author_email,
-    url=metadata.url,
-    packages=find_packages(),
-    tests_require=metadata.test_requirements,
-    install_requires=metadata.requirements,
-    license=metadata.license,
-    classifiers=metadata.classifiers,
-    test_suite="omni.test",
-    include_package_data=True,
-    entry_points={
-        "console_scripts": [
-            "omnid = omni.omnid:main",
-        ],
-    },
-)
+if __name__ == "__main__":
+    setup(
+        name=metadata.package,
+        version=metadata.version,
+        description=metadata.description,
+        long_description=file_contents("README.rst"),
+        author=metadata.main_author_name,
+        author_email=metadata.main_author_email,
+        url=metadata.url,
+        packages=find_packages(),
+        tests_require=metadata.test_requirements,
+        install_requires=metadata.requirements,
+        extras_require=metadata.extra_requirements,
+        license=metadata.license,
+        classifiers=metadata.classifiers,
+        test_suite="omni.test",
+        include_package_data=True,
+        entry_points=metadata.entry_points,
+    )
