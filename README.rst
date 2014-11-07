@@ -1,6 +1,5 @@
-====
-OMNI
-====
+.. image:: https://raw.githubusercontent.com/aperezdc/omni/master/assets/omni-logo-full.png
+   :alt: OMNI
 
 Installation
 ============
