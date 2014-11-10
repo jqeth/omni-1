@@ -212,6 +212,7 @@ class TestPlainStoreInstatiation(unittest.TestCase):
         for conf in self.invalid_confs:
             with self.assertRaises(Exception):
                 s = plain.from_config(conf)
+                self.assertTrue(isinstance(s, plain.PlainStore))
 
     def test_find_store(self):
         self.assertEqual(plain, store.find("plain"))
@@ -221,6 +222,7 @@ class TestablePlainStore(plain.PlainStore):
     def __init__(self, data, path, format_, *fargs):
         super(TestablePlainStore, self).__init__(path, format_, *fargs)
         self._data = data
+        self.last_io = None
 
     def _open_file(self, mode):
         if mode == "r":
