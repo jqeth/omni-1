@@ -37,7 +37,7 @@ def cmd_list_users(omni_app, realm_or_store):
 
     Options:
 
-      -h, --help            Show this help message.
+      -h, --help  Show this help message.
     """
     return sorted(omni_app.get_realm_or_store(realm_or_store).usernames())
 
@@ -52,7 +52,7 @@ def cmd_try_authenticate(omni_app, realm_or_store, username):
 
     Options:
 
-      -h, --help            Show this help message.
+      -h, --help  Show this help message.
     """
     from getpass import getpass
     authenticate = omni_app.get_realm_or_store(realm_or_store).authenticate
