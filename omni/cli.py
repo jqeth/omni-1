@@ -17,13 +17,32 @@ Options:
 
 The most commonly used commands are:
 
-  server   Starts the OMNI server.
+  server       Starts the OMNI server.
+  list-users   Lists users in realm or a store.
 
 See 'omni help <command>' for more information on a specific command.
 """
 
 from .metadata import metadata
-from six import iteritems
+from . import app
+from six import iteritems, print_
+
+
+def cmd_list_users(omni_app, realm_or_store):
+    """
+    Usage: omni list-users <realm-or-store>
+
+    Shows a list of users in a realm or store.
+
+    Options:
+
+      -h, --help            Show this help message.
+    """
+    if "." in realm_or_store:
+        usernames = omni_app.get_store(realm_or_store).usernames
+    else:
+        usernames = omni_app.get_realm(realm_or_store).usernames
+    return sorted(usernames())
 
 
 def cmd_try_authenticate(config, realm_or_store, username):
@@ -39,7 +58,6 @@ def cmd_try_authenticate(config, realm_or_store, username):
       -h, --help            Show this help message.
     """
     from getpass import getpass
-    from omni import app
 
     application = app.make_application(config)
     if "." in realm_or_store:
@@ -135,8 +153,10 @@ def main():
         if is_args or is_kwarg:
             pass
         elif name == "config":
-            from omni.app import load_config
-            call_args[name] = load_config(args.opt_config)
+            call_args[name] = app.load_config(args.opt_config)
+        elif name == "omni_app":
+            config = app.load_config(args.opt_config)
+            call_args[name] = app.make_application(config)
         elif alt_name in cmd_args:
             call_args[name] = cmd_args[alt_name]
         elif name in cmd_args:
@@ -146,7 +166,12 @@ def main():
 
     result = command(**call_args)
     if result is not None:
-        raise SystemExit(result)
+        from inspect import isgenerator
+        if isgenerator(result) or isinstance(result, (list, tuple)):
+            for item in result:
+                print_(item)
+        else:
+            raise SystemExit(result)
 
 
 if __name__ == "__main__":
