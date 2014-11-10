@@ -23,6 +23,12 @@ class Authenticator(object):
         """
         raise NotImplementedError
 
+    def usernames(self):
+        """
+        Returns an iterator yielding known user names.
+        """
+        raise NotImplementedError
+
 
 class Realm(Authenticator, list):
     """
@@ -37,6 +43,15 @@ class Realm(Authenticator, list):
             if a.authenticate(username, password):
                 return True
         return False
+
+    def usernames(self):
+        seen = set()
+        for a in self:
+            for username in a.usernames():
+                if username in seen:
+                    continue
+                seen.add(username)
+                yield username
 
 
 class Base(Authenticator):
