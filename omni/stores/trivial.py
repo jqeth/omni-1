@@ -7,7 +7,18 @@
 # Distributed under terms of the MIT license.
 
 """
-Implements a store with a fixed user name and password.
+Authenticate a single user with a fixed password.
+
+Stores a username and password pair in memory to be checked against.
+
+Configuration options
+=====================
+
+``username``
+    Fixed user name.
+
+``password`` (optional)
+    Password for the user.
 """
 
 from .. import store
