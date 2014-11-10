@@ -26,6 +26,33 @@ from .metadata import metadata
 from six import iteritems
 
 
+def cmd_try_authenticate(config, realm_or_store, username):
+    """
+    Usage: omni try-authenticate <realm-or-store> <username>
+
+    Tries to authenticate an user interactively agains a given realm
+    or a particular store. A zero exit status means that authentication
+    succeeded. This command can be useful to debug configurations.
+
+    Options:
+
+      -h, --help            Show this help message.
+    """
+    from getpass import getpass
+    from omni import app
+
+    application = app.make_application(config)
+    if "." in realm_or_store:
+        authenticate = application.get_store(realm_or_store).authenticate
+    else:
+        authenticate = application.get_realm(realm_or_store).authenticate
+
+    if authenticate(username, getpass("password for {}: ".format(username))):
+        return 0
+    return 1
+
+
+
 def cmd_server(config, http_port=None, http_host=None):
     """
     Usage: omni server [--http-port=PORT --http-host=HOST]
