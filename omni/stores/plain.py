@@ -77,6 +77,9 @@ class BaseFileFormat(object):
     def __getitem__(self, username):
         return self._users[username]
 
+    def __setitem__(self, username, password):
+        self._users[username] = password
+
     @property
     def users(self):
         return iterkeys(self._users)
@@ -137,6 +140,8 @@ class HtpasswdFileFormat(BaseFileFormat):
 
 
 class PlainStore(store.Base):
+    readonly = False
+
     def __init__(self, path, format_, *fargs):
         super(PlainStore, self).__init__()
         self._format = format_
@@ -155,6 +160,12 @@ class PlainStore(store.Base):
     def usernames(self):
         with self._format(self._open_file, *self._fargs) as db:
             return db.users
+
+    def set_password(self, username, password):
+        with self._format(self._open_file, *self._fargs) as db:
+            if username not in db:
+                raise KeyError("invalid username {}".format(username))
+            db[username] = db.crypt_password(username, password)
 
 
 def from_config(config):

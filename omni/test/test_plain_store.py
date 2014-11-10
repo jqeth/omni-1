@@ -251,3 +251,6 @@ class TestPlainStoreAuthentication(unittest.TestCase):
         s = TestablePlainStore(self.plain_data, "path/to/file",
                 plain.PlainFileFormat)
         self.assertEqual(["alice", "bob"], list(sorted(s.usernames())))
+
+    # TODO: Test .set_password(), but that needs to make TestablePlainStore
+    # actually save data somewhere instead of throwing it away.
