@@ -74,11 +74,16 @@ def iterfargs(func):
     from inspect import getargspec
     from six.moves import zip
     args, varargs, varkw, defaults = getargspec(func)
+    num_defaults = 0 if defaults is None else len(defaults)
 
-    for var in args[:-len(defaults)]:
-        yield (var, None, False, False)
-    for var, default in zip(args[-len(defaults):], defaults):
-        yield (var, default, False, False)
+    if num_defaults > 0:
+        for var in args[:-num_defaults]:
+            yield (var, None, False, False)
+        for var, default in zip(args[-num_defaults:], defaults):
+            yield (var, default, False, False)
+    else:
+        for var in args:
+            yield (var, None, False, False)
     if varargs is not None:
         yield (varargs, (), True, False)
     if varkw is not None:
