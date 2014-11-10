@@ -8,6 +8,7 @@ Authors:
 Requirements:
 	six>=1.8.0
 	wcfg>=4
+	docopt>=0.6.2
 	WebOb>=1.4
 	aiowsgi>=0.3
 Extra-Requirements:
@@ -16,7 +17,7 @@ Extra-Requirements:
 Test-Requirements:
 	green>=1.7.0
 Scripts:
-	omnid = omni.scripts:omnid
+	omni = omni.cli:main
 Classifiers:
 	Development Status :: 4 - Beta
 	Intended Audience :: Developers
