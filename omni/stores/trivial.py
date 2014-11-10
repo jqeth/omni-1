@@ -21,6 +21,9 @@ class TrivialStore(store.Base):
     def authenticate(self, username, password):
         return (username, password) == self._credentials
 
+    def usernames(self):
+        yield self._credentials[0]
+
 
 def from_config(config):
     return TrivialStore(config["username"], config.get("password", ""))
