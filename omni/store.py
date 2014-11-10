@@ -29,6 +29,37 @@ class Authenticator(object):
         """
         raise NotImplementedError
 
+    def set_password(self, username, password):
+        """
+        Set a new password for the given user.
+        """
+        raise NotImplementedError
+
+    def has_user(self, username):
+        """
+        Checks whether the store knows about a given user.
+        """
+        try:
+            return self.get_user(username) is not None
+        except NotImplementedError:
+            for u in self.usernames():
+                if u == username:
+                    return True
+            return False
+
+    def get_user(self, username):
+        """
+        Obtains the details for a given user name.
+        """
+        raise NotImplementedError
+
+
+class AccessError(Exception):
+    """
+    Raised when a store or realm cannot be accessed in the requested way.
+    """
+    pass
+
 
 class Realm(Authenticator, list):
     """
@@ -52,6 +83,16 @@ class Realm(Authenticator, list):
                     continue
                 seen.add(username)
                 yield username
+
+    def set_password(self, username, password):
+        for a in self:
+            if a.has_user(username):
+                if a.readonly:
+                    raise AccessError("user {} belongs is in a read-only store"
+                            .format(username))
+                a.set_password(username, password)
+                return
+        raise KeyError("user {} does not exist".format(username))
 
 
 class Base(Authenticator):
