@@ -17,8 +17,9 @@ Options:
 
 The most commonly used commands are:
 
-  server       Starts the OMNI server.
-  list-users   Lists users in realm or a store.
+  server           Starts the OMNI server.
+  list-users       Lists users in realm or a store.
+  change-password  Changes the passform for an user.
 
 See 'omni help <command>' for more information on a specific command.
 """
@@ -59,6 +60,35 @@ def cmd_try_authenticate(omni_app, realm_or_store, username):
         return 0
     return 1
 
+
+def cmd_change_password(omni_app, realm_or_store, username, opt_stdin=False):
+    """
+    Usage: omni change-password <realm-or-store> <username>
+
+    Options:
+
+      -i, --stdin  Read passwords from standard input. The first line must
+                   be the existing password, and the second line the new
+                   password.
+      -h, --help   Show this help message.
+    """
+    from getpass import getpass
+    db = omni_app.get_realm_or_store(realm_or_store)
+    if opt_stdin:
+        from sys import stdin
+        old_pw = stdin.readline().strip()
+        if not db.authenticate(username, old_pw):
+            return "Incorrect password"
+        new_pw = stdin.readline().strip()
+    else:
+        old_pw = getpass("old password for {}: ".format(username))
+        if not db.authenticate(username, old_pw):
+            return "Incorrect password"
+        old_pw = getpass("new password for {}: ".format(username))
+        new_pw = getpass("new password for {} (again): ".format(username))
+        if old_pw != new_pw:
+            return "Passwords do not match"
+    db.set_password(username, new_pw)
 
 
 def cmd_server(config, http_port=None, http_host=None):
