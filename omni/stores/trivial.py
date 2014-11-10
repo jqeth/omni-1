@@ -25,6 +25,8 @@ from .. import store
 
 
 class TrivialStore(store.Base):
+    readonly = False
+
     def __init__(self, username, password):
         super(TrivialStore, self).__init__()
         self._credentials = (username, password)
@@ -34,6 +36,11 @@ class TrivialStore(store.Base):
 
     def usernames(self):
         yield self._credentials[0]
+
+    def set_password(self, username, password):
+        if username != self._credentials[0]:
+            raise KeyError("invalid username {}".format(username))
+        self._credentials = (username, password)
 
 
 def from_config(config):
