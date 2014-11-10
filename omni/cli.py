@@ -32,10 +32,10 @@ def cmd_server(config, http_port=None, http_host=None):
 
     Options:
 
-    -p, --http-port=PORT  Port in which to serve HTTP requests.
-    --http-host=HOST      Host name of IP address to bind to.
+      -p, --http-port=PORT  Port in which to serve HTTP requests.
+      --http-host=HOST      Host name of IP address to bind to.
 
-    -h, --help            Show this help message.
+      -h, --help            Show this help message.
     """
     from omni import app
     from aiowsgi.compat import asyncio
@@ -57,9 +57,11 @@ class ArgBag(dict):
     def __getattr__(self, name):
         return self[name]
 
-def docopt(*args, **kwarg):
+def docopt(doc, *args, **kwarg):
     from docopt import docopt as do_docopt
-    args = do_docopt(*args, **kwarg)
+    from textwrap import dedent
+
+    args = do_docopt(dedent(doc), *args, **kwarg)
     result = ArgBag()
     for k, v in iteritems(args):
         if k.startswith("--"):
