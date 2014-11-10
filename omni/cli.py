@@ -45,7 +45,7 @@ def cmd_list_users(omni_app, realm_or_store):
     return sorted(usernames())
 
 
-def cmd_try_authenticate(config, realm_or_store, username):
+def cmd_try_authenticate(omni_app, realm_or_store, username):
     """
     Usage: omni try-authenticate <realm-or-store> <username>
 
@@ -57,14 +57,12 @@ def cmd_try_authenticate(config, realm_or_store, username):
 
       -h, --help            Show this help message.
     """
-    from getpass import getpass
-
-    application = app.make_application(config)
     if "." in realm_or_store:
-        authenticate = application.get_store(realm_or_store).authenticate
+        authenticate = omni_app.get_store(realm_or_store).authenticate
     else:
-        authenticate = application.get_realm(realm_or_store).authenticate
+        authenticate = omni_app.get_realm(realm_or_store).authenticate
 
+    from getpass import getpass
     if authenticate(username, getpass("password for {}: ".format(username))):
         return 0
     return 1
