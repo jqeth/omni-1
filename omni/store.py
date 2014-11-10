@@ -84,6 +84,12 @@ class OMNI(object):
     def get_store(self, name):
         return self._stores[name]
 
+    def get_realm_or_store(self, name):
+        if "." in name:
+            return self.get_store(name)
+        else:
+            return self.get_realm(name)
+
     def __contains__(self, name):
         return name in self._realms
 

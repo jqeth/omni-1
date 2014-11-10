@@ -38,11 +38,7 @@ def cmd_list_users(omni_app, realm_or_store):
 
       -h, --help            Show this help message.
     """
-    if "." in realm_or_store:
-        usernames = omni_app.get_store(realm_or_store).usernames
-    else:
-        usernames = omni_app.get_realm(realm_or_store).usernames
-    return sorted(usernames())
+    return sorted(omni_app.get_realm_or_store(realm_or_store).usernames())
 
 
 def cmd_try_authenticate(omni_app, realm_or_store, username):
@@ -57,12 +53,8 @@ def cmd_try_authenticate(omni_app, realm_or_store, username):
 
       -h, --help            Show this help message.
     """
-    if "." in realm_or_store:
-        authenticate = omni_app.get_store(realm_or_store).authenticate
-    else:
-        authenticate = omni_app.get_realm(realm_or_store).authenticate
-
     from getpass import getpass
+    authenticate = omni_app.get_realm_or_store(realm_or_store).authenticate
     if authenticate(username, getpass("password for {}: ".format(username))):
         return 0
     return 1
