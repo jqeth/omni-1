@@ -126,6 +126,10 @@ class PlainStore(store.Base):
             crypted = db.crypt_password(username, password, current)
             return compare_digest(current, crypted)
 
+    def usernames(self):
+        with self._format(self._open_file, *self._fargs) as db:
+            return db.users
+
 
 def from_config(config):
     file_format = config.get("format", "plain")

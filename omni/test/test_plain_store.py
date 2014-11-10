@@ -119,6 +119,10 @@ class TestPlainStoreFileFormat(unittest.TestCase):
             pass
         self.assertEqual(dedent(self.data02), self.last_io.getvalue())
 
+    def test_list_usernames(self):
+        with self.userdb_string(self.data02) as db:
+            self.assertEqual(["alice", "bob", "peter"], list(db.users))
+
 
 class TestHtpasswdStoreFormat(unittest.TestCase):
 
@@ -164,6 +168,10 @@ class TestHtpasswdStoreFormat(unittest.TestCase):
             # If we don't pass the salt (or the existing crypted password),
             # a new crupted password one will be created with a new salt.
             self.assertNotEqual(old_crypted_pw, new_crypted_pw)
+
+    def test_list_usernames(self):
+        with self.userdb_string(*self.data01) as db:
+            self.assertEqual(["alice"], list(db.users))
 
 
 class TestPlainStoreInstatiation(unittest.TestCase):
@@ -237,3 +245,7 @@ class TestPlainStoreAuthentication(unittest.TestCase):
                 plain.PlainFileFormat)
         self.assertFalse(s.authenticate("bob", "badpass"))
 
+    def test_plain_list_usernames(self):
+        s = TestablePlainStore(self.plain_data, "path/to/file",
+                plain.PlainFileFormat)
+        self.assertEqual(["alice", "bob"], list(sorted(s.usernames())))
