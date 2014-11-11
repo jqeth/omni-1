@@ -260,6 +260,13 @@ class TestPlainStoreAuthentication(unittest.TestCase):
         self.assertFalse(s.authenticate("bob", "b0b"))
         self.assertTrue(s.authenticate("bob", "blurb"))
 
+    def test_plain_set_password_invalid_user(self):
+        s = TestablePlainStore(self.plain_data, "path/to/files",
+                plain.PlainFileFormat)
+        self.assertFalse(s.has_user("peter"))
+        with self.assertRaises(KeyError):
+            s.set_password("peter", "parker")
+
     def test_crypt_set_password(self):
         m = plain._crypt_methods.get("crypt", None)
         if m is None:

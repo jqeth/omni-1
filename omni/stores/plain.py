@@ -117,7 +117,7 @@ class BaseFileFormat(object):
                     fd.write("{}:{}\n".format(u, p))
                 else:
                     fd.write("{}:{}:{}\n".format(u, p, x))
-        return self
+        return False
 
     def crypt_password(self, username, password, salt=None):
         raise NotImplementedError
