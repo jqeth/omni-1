@@ -186,9 +186,6 @@ class TestPlainStoreInstatiation(unittest.TestCase):
         { "path": "path/to/passwd", "format": "plain" },
         { "path": "path/to/passwd", "format": "htpasswd" },
         { "path": "path/to/passwd", "format": "htpasswd", "method": "crypt" },
-        # The configuration dictionary is not strictly checked, and keys
-        # which are of not interest for instantiation are just skipped over.
-        { "path": "path/to/passwd", "pi": 3.14 },
     )
 
     def test_from_valid_conf(self):
@@ -211,6 +208,9 @@ class TestPlainStoreInstatiation(unittest.TestCase):
         { "path": "path/to/passwd", "format": "htpasswd", "method": True },
         { "path": "path/to/passwd", "format": "htpasswd", "method": 3.14 },
         { "path": "path/to/passwd", "format": "htpasswd", "method": "bogus" },
+        # The configuration dictionary is strictly checked, and keys
+        # which are of not interest for instantiation cause errors.
+        { "path": "path/to/passwd", "pi": 3.14 },
     )
 
     def test_from_invalid_conf(self):
