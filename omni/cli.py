@@ -128,7 +128,11 @@ def cmd_server(omni_config, http_port=None, http_host=None):
     wsgi_app = app.make_wsgi_application(omni_config)
     loop = asyncio.get_event_loop()
     aiowsgi.create_server(wsgi_app, loop=loop, host=http_host, port=http_port)
-    loop.run_forever()
+
+    try:
+        loop.run_forever()
+    except KeyboardInterrupt:
+        pass
 
 
 class ArgBag(dict):
