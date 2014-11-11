@@ -66,14 +66,14 @@ class Realm(Authenticator, list):
     A realm is a list of `Authenticator` objects which are tried in order.
     """
     def __init__(self, description, *arg):
-        super(Realm, self).__init__(*arg)
+        super(Realm, self).__init__(arg)
         self.description = description
 
     def authenticate(self, username, password):
         for a in self:
-            if a.authenticate(username, password):
-                return True
-        return False
+            if a.has_user(username):
+                return a.authenticate(username, password)
+        raise KeyError("user {} does not exist".format(username))
 
     def usernames(self):
         seen = set()
@@ -92,6 +92,18 @@ class Realm(Authenticator, list):
                             .format(username))
                 a.set_password(username, password)
                 return
+        raise KeyError("user {} does not exist".format(username))
+
+    def has_user(self, username):
+        for a in self:
+            if a.has_user(username):
+                return True
+        return False
+
+    def get_user(self, username):
+        for a in self:
+            if a.has_user(username):
+                return a.get_user(username)
         raise KeyError("user {} does not exist".format(username))
 
 
