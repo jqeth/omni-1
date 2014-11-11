@@ -6,6 +6,7 @@
 #
 # Distributed under terms of the GPLv3 license.
 
+from codecs import open
 from email import parser, message
 from os import path
 
