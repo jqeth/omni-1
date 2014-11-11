@@ -96,7 +96,8 @@ class BaseFileFormat(object):
     def delete(self, username):
         if username in self._users:
             del self._users[username]
-            del self._infos[username]
+            if username in self._infos:
+                del self._infos[username]
         else:
             raise KeyError("User not found: {}".format(username))
 

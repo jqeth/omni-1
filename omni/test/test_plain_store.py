@@ -131,7 +131,7 @@ class TestPlainStoreFileFormat(unittest.TestCase):
 
     def test_list_usernames(self):
         with self.userdb_string(self.data02) as db:
-            self.assertEqual(["alice", "bob", "peter"], list(db.users))
+            self.assertEqual(["peter", "bob", "alice"], list(db.users))
 
 
 class TestHtpasswdStoreFormat(unittest.TestCase):
@@ -153,7 +153,7 @@ class TestHtpasswdStoreFormat(unittest.TestCase):
 
     # Generated with: printf "alice:$(openssl passwd -crypt mirror)" 
     data01 = (u"""\
-    alice:su7aWQyEG4lo."
+    alice:su7aWQyEG4lo.
     """, "crypt")
 
     def test_user_crypt_check_password(self):
