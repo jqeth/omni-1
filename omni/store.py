@@ -9,6 +9,8 @@
 """
 Credential store definition and related utilities.
 """
+from inspect import isgenerator
+
 
 class Authenticator(object):
     """
@@ -65,8 +67,12 @@ class Realm(Authenticator, list):
     """
     A realm is a list of `Authenticator` objects which are tried in order.
     """
-    def __init__(self, description, *arg):
-        super(Realm, self).__init__(arg)
+    def __init__(self, description, *realms):
+        if len(realms) == 1 and isgenerator(realms[0]):
+            super(Realm, self).__init__()
+            self.extend(realms[0])
+        else:
+            super(Realm, self).__init__(realms)
         self.description = description
 
     def authenticate(self, username, password):
