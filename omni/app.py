@@ -11,7 +11,15 @@ Command line entry point for the OMNI daemon.
 """
 
 from six import iteritems, string_types, text_type
-from omni import store
+from . import store, config
+
+
+@config.schema
+def config_realms_schema():
+    return {
+        "methods": [config.DotIdentifier],
+        config.Optional("description"): config.Text,
+    }
 
 
 def load_config(path):
@@ -20,21 +28,33 @@ def load_config(path):
         return wcfg.load(f)
 
 
-def make_application(config):
+def make_application(omni_config):
     app = store.OMNI()
-    for name, store_config in iteritems(config.get("stores", {})):
+    for name, store_config in iteritems(omni_config.get("stores", {})):
         store_type = name.split(".", 1)[0]
-        store_item = store.find(store_type).from_config(store_config)
-        app.add_store(name, store_item)
-        print("Store {} registered (type: {}), config:".format(name,
-            store_type), store_config)
+        store_module = store.find(store_type)
+        try:
+            store_config = store_module.config_schema.validate(store_config)
+        except config.SchemaError as e:
+            raise config.SchemaError((), "in 'stores' section, item '{}': {!s}"
+                    .format(name, e))
+        app.add_store(name, store_module.from_config(store_config))
 
-    for name, realm_config in iteritems(config.get("realms", {})):
+    for name, realm_config in iteritems(omni_config.get("realms", {})):
+        try:
+            realm_config = config_realms_schema.validate(realm_config)
+        except config.SchemaError as e:
+            raise config.SchemaError((), "in 'realms' section: {!s}"
+                    .format(e))
+
         methods = realm_config["methods"]
-        realm = store.Realm(str(realm_config.get("description", name)),
-                (app.get_store(name) for name in methods))
+        try:
+            realm = store.Realm(realm_config.get("description", name),
+                    (app.get_store(name) for name in methods))
+        except KeyError as e:
+            raise config.SchemaError((), ("in 'realms' section, item '{s}':"
+                " undefined store '{!s}'").format(name, e))
         app.add_realm(name, realm)
-        print("Realm {} registered:".format(name), realm)
 
     return app
 

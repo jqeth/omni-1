@@ -22,7 +22,7 @@ Configuration options
 """
 
 from .. import store
-
+from .. import config
 
 class TrivialStore(store.Base):
     readonly = False
@@ -43,5 +43,14 @@ class TrivialStore(store.Base):
         self._credentials = (username, password)
 
 
+@config.schema
+def config_schema():
+    return {
+        "username": config.Identifier,
+        config.Optional("password"): config.Password,
+    }
+
+
 def from_config(config):
+    config = config_schema.validate(config)
     return TrivialStore(config["username"], config.get("password", ""))

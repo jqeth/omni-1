@@ -25,8 +25,9 @@ See 'omni help <command>' for more information on a specific command.
 """
 
 from .metadata import metadata
-from . import app
+from . import app, config
 from six import iteritems, print_
+import wcfg
 
 
 def cmd_list_users(omni_app, realm_or_store):
@@ -91,7 +92,15 @@ def cmd_change_password(omni_app, realm_or_store, username, opt_stdin=False):
     db.set_password(username, new_pw)
 
 
-def cmd_server(config, http_port=None, http_host=None):
+@config.schema
+def config_http_schema():
+    return {
+        config.Optional("host"): config.NetworkAddress,
+        config.Optional("port"): config.PortNumber,
+    }
+
+
+def cmd_server(omni_config, http_port=None, http_host=None):
     """
     Usage: omni server [--http-port=PORT --http-host=HOST]
 
@@ -102,17 +111,21 @@ def cmd_server(config, http_port=None, http_host=None):
 
       -h, --help            Show this help message.
     """
-    from omni import app
     from aiowsgi.compat import asyncio
     import aiowsgi
 
     # Apply command line overrides.
-    if http_host is None:
-        http_host = config["http"].get("host", "localhost")
-    if http_port is None:
-        http_port = config["http"].get("port", 8080)
+    if http_host is None or http_port is None:
+        http_config = { "port": 8080, "host": "localhost" }
+        if "http" in omni_config:
+            conf = config_http_schema.validate(omni_config["http"])
+            http_config.update(conf)
+        if http_host is None:
+            http_host = http_config["host"]
+        if http_port is None:
+            http_port = http_config["port"]
 
-    wsgi_app = app.make_wsgi_application(config)
+    wsgi_app = app.make_wsgi_application(omni_config)
     loop = asyncio.get_event_loop()
     aiowsgi.create_server(wsgi_app, loop=loop, host=http_host, port=http_port)
     loop.run_forever()
@@ -166,25 +179,36 @@ def main():
 
     # Parse command line options for the subcommand.
     cmd_args = docopt(command.__doc__, argv=[args.command] + args.args)
+    try:
+        omni_config = None
+        call_args = {}
+        for name, default, is_args, is_kwarg in iterfargs(command):
+            alt_name = "opt_" + name
+            if is_args or is_kwarg:
+                pass
+            elif name == "omni_config":
+                if omni_config is None:
+                    omni_config = app.load_config(args.opt_config)
+                call_args[name] = omni_config
+            elif name == "omni_app":
+                if omni_config is None:
+                    omni_config = app.load_config(args.opt_config)
+                call_args[name] = app.make_application(omni_config)
+            elif alt_name in cmd_args:
+                call_args[name] = cmd_args[alt_name]
+            elif name in cmd_args:
+                call_args[name] = cmd_args[name]
+            else:
+                call_args[name] = default
 
-    call_args = {}
-    for name, default, is_args, is_kwarg in iterfargs(command):
-        alt_name = "opt_" + name
-        if is_args or is_kwarg:
-            pass
-        elif name == "config":
-            call_args[name] = app.load_config(args.opt_config)
-        elif name == "omni_app":
-            config = app.load_config(args.opt_config)
-            call_args[name] = app.make_application(config)
-        elif alt_name in cmd_args:
-            call_args[name] = cmd_args[alt_name]
-        elif name in cmd_args:
-            call_args[name] = cmd_args[name]
-        else:
-            call_args[name] = default
+        result = command(**call_args)
+    except wcfg.ParseError as e:
+        raise SystemExit("error parsing config file:\n{s}:{!s}"
+                .format(args.opt_config, e))
+    except config.SchemaError as e:
+        raise SystemExit("configuration file validation error:\n{!s}"
+                .format(e))
 
-    result = command(**call_args)
     if result is not None:
         from inspect import isgenerator
         if isgenerator(result) or isinstance(result, (list, tuple)):

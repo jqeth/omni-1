@@ -27,6 +27,7 @@ Configuration options
 """
 
 from .. import store
+from .. import config
 
 
 class PAMStore(store.Base):
@@ -47,5 +48,14 @@ class PAMStore(store.Base):
                 if pw.pw_uid >= self._min_uid)
 
 
+@config.schema
+def config_schema():
+    return {
+        config.Optional("service"): config.Identifier,
+        config.Optional("min-uid"): config.NaturalNumber,
+    }
+
+
 def from_config(config):
+    config = config_schema.validate(config)
     return PAMStore(config.get("service", None), config.get("min-uid", 1000))
