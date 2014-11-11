@@ -44,8 +44,7 @@ from .. import store
 from six import iteritems, iterkeys
 from codecs import open
 from collections import OrderedDict
-from hmac import compare_digest
-import crypt
+import crypt, sys
 
 _crypt_methods = {}
 if hasattr(crypt, "methods"):  # pragma: no cover
@@ -63,6 +62,17 @@ else:  # pragma: no cover
             from random import choice
             return choice(self._salt_chars) + choice(self._salt_chars)
     _crypt_mksalt = _crypt_mksalt()
+
+if sys.version_info.major == 2:  # pragma: no cover
+    from hmac import compare_digest as _compare_digest_base
+    def compare_digest(a, b):
+        if isinstance(a, unicode):
+            a = a.encode("utf-8")
+        if isinstance(b, unicode):
+            b = b.encode("utf-8")
+        return _compare_digest_base(a, b)
+else:  # pragma: no cover
+    from hmac import compare_digest
 
 
 class BaseFileFormat(object):

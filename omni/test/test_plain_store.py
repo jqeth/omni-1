@@ -13,7 +13,7 @@ from six import StringIO
 import unittest
 
 
-class StringIOWithContext(StringIO):
+class StringIOWithContext(StringIO, object):
     def __init__(self, persistent, data=None):
         super(StringIOWithContext, self).__init__(data)
         self.persistent = persistent
