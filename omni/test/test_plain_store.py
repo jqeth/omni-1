@@ -14,10 +14,26 @@ import unittest
 
 
 class StringIOWithContext(StringIO):
+    def __init__(self, persistent, data=None):
+        super(StringIOWithContext, self).__init__(data)
+        self.persistent = persistent
+
     def __enter__(self):
         return self
+
     def __exit__(self, type_, value, traceback):
-        pass
+        self.persistent.data = self.getvalue()
+
+
+class PersistentStringIO(object):
+    def __init__(self, data=""):
+        self.data = data
+
+    def __call__(self, mode):
+        if "w" in mode:
+            return StringIOWithContext(self)
+        else:
+            return StringIOWithContext(self, self.data)
 
 
 class TestPlainStoreUnimplementeds(unittest.TestCase):
@@ -37,14 +53,8 @@ class TestPlainStoreFileFormat(unittest.TestCase):
         self.last_io = None
 
     def userdb_string(self, data):
-        def open_data(mode):
-            if mode == "r":
-                self.last_io = \
-                        StringIOWithContext(dedent(data))
-            else:
-                self.last_io = StringIOWithContext()
-            return self.last_io
-        return plain.PlainFileFormat(open_data)
+        self.last_io = PersistentStringIO(dedent(data))
+        return plain.PlainFileFormat(self.last_io)
 
     data01 = u"""\
     bob:b0b
@@ -75,7 +85,7 @@ class TestPlainStoreFileFormat(unittest.TestCase):
             self.assertEqual("andr3w", db["andrew"])
         expected = dedent(self.data01).strip()
         expected += "\nandrew:andr3w\n"
-        self.assertEqual(expected, self.last_io.getvalue())
+        self.assertEqual(expected, self.last_io.data)
 
     def test_user_add_with_extrainfo(self):
         with self.userdb_string(self.data01) as db:
@@ -84,7 +94,7 @@ class TestPlainStoreFileFormat(unittest.TestCase):
             self.assertEqual("andr3w", db["andrew"])
         expected = dedent(self.data01).strip()
         expected += "\nandrew:andr3w:Some extra, ignored info\n"
-        self.assertEqual(expected, self.last_io.getvalue())
+        self.assertEqual(expected, self.last_io.data)
 
     def test_user_add_existing(self):
         with self.userdb_string(self.data01) as db:
@@ -95,14 +105,14 @@ class TestPlainStoreFileFormat(unittest.TestCase):
         with self.userdb_string(self.data01) as db:
             db.delete("bob")
             self.assertFalse("bob" in db)
-        self.assertEqual("alice:4l1c3\n", self.last_io.getvalue())
+        self.assertEqual("alice:4l1c3\n", self.last_io.data)
 
     def test_user_delete_nonexisting(self):
         with self.userdb_string(self.data01) as db:
             with self.assertRaises(KeyError):
                 db.delete("peter")
         expected = dedent(self.data01)
-        self.assertEqual(expected, self.last_io.getvalue())
+        self.assertEqual(expected, self.last_io.data)
 
     def test_user_crypt_password(self):
         with self.userdb_string(self.data01) as db:
@@ -117,7 +127,7 @@ class TestPlainStoreFileFormat(unittest.TestCase):
     def test_extrainfo_roundtrip(self):
         with self.userdb_string(self.data02) as db:
             pass
-        self.assertEqual(dedent(self.data02), self.last_io.getvalue())
+        self.assertEqual(dedent(self.data02), self.last_io.data)
 
     def test_list_usernames(self):
         with self.userdb_string(self.data02) as db:
@@ -137,13 +147,8 @@ class TestHtpasswdStoreFormat(unittest.TestCase):
         if m is None:
             self.skipTest(("Crypt method '{}' is not supported by this"
                 " Python version").format(method))
-        def open_data(mode):
-            if mode == "r":
-                self.last_io = StringIOWithContext(dedent(data))
-            else:
-                self.last_io = StringIOWithContext()
-            return self.last_io
-        return plain.HtpasswdFileFormat(open_data, m)
+        self.last_io = PersistentStringIO(dedent(data))
+        return plain.HtpasswdFileFormat(self.last_io, m)
 
 
     # Generated with: printf "alice:$(openssl passwd -crypt mirror)" 
@@ -221,15 +226,10 @@ class TestPlainStoreInstatiation(unittest.TestCase):
 class TestablePlainStore(plain.PlainStore):
     def __init__(self, data, path, format_, *fargs):
         super(TestablePlainStore, self).__init__(path, format_, *fargs)
-        self._data = data
-        self.last_io = None
+        self.last_io = PersistentStringIO(dedent(data))
 
     def _open_file(self, mode):
-        if mode == "r":
-            self.last_io = StringIOWithContext(dedent(self._data))
-        else:
-            self.last_io = StringIOWithContext()
-        return self.last_io
+        return self.last_io(mode)
 
 
 class TestPlainStoreAuthentication(unittest.TestCase):
@@ -252,5 +252,23 @@ class TestPlainStoreAuthentication(unittest.TestCase):
                 plain.PlainFileFormat)
         self.assertEqual(["alice", "bob"], list(sorted(s.usernames())))
 
-    # TODO: Test .set_password(), but that needs to make TestablePlainStore
-    # actually save data somewhere instead of throwing it away.
+    def test_plain_set_password(self):
+        s = TestablePlainStore(self.plain_data, "path/to/files",
+                plain.PlainFileFormat)
+        self.assertTrue(s.authenticate("bob", "b0b"))
+        s.set_password("bob", "blurb")
+        self.assertFalse(s.authenticate("bob", "b0b"))
+        self.assertTrue(s.authenticate("bob", "blurb"))
+
+    def test_crypt_set_password(self):
+        m = plain._crypt_methods.get("crypt", None)
+        if m is None:
+            self.skipTest("Crypt method 'crypt' is not supported by this"
+                " Python version")
+            return
+
+        s = TestablePlainStore(self.crypt_data, "path/to/file",
+                plain.HtpasswdFileFormat, m)
+        s.set_password("alice", "shiny")
+        self.assertFalse(s.authenticate("alice", "mirror"))
+        self.assertTrue(s.authenticate("alice", "shiny"))
