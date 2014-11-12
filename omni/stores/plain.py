@@ -40,7 +40,7 @@ Configuration options
       setting.
 """
 
-from .. import store, config
+from .. import store, valid
 from six import iteritems, iterkeys
 from codecs import open
 from collections import OrderedDict
@@ -179,17 +179,15 @@ class PlainStore(store.Base):
             db[username] = db.crypt_password(username, password)
 
 
-@config.schema
-def config_schema():
-    return {
-        "path": config.Path,
-        config.Optional("format"): config.Or(u"plain", u"unix", u"htpasswd"),
-        config.Optional("method"): config.Or(*tuple(_crypt_methods.keys())),
-    }
+config_schema = valid.Schema({
+    "path": valid.Path,
+    valid.Optional("format"): valid.Or(u"plain", u"unix", u"htpasswd"),
+    valid.Optional("method"): valid.Or(*tuple(_crypt_methods.keys())),
+})
 
+
+@valid.argument(config_schema)
 def from_config(config):
-    config = config_schema.validate(config)
-
     file_format = config.get("format", "plain")
     if file_format == "plain":
         file_format = PlainFileFormat

@@ -38,15 +38,6 @@ def IPv6Address(value):
         return False
 
 
-def schema(func):
-    schema = Schema(func())
-    @wraps(func)
-    def f():
-        return schema
-    f.validate = lambda d: f().validate(d)
-    return f
-
-
 def Match(regexp, flags=0):
     import re
     match = re.compile(regexp, flags).match
@@ -65,3 +56,17 @@ NaturalNumber  = And(int, lambda v: v >= 0, error="Not a positive number")
 PortNumber     = And(int, lambda v: 0 < v <= 65535)
 Hostname       = Match(r"^[\w][\.\w]*$")
 NetworkAddress = Or(IPv4Address, IPv6Address, Hostname)
+
+
+def argument(schema, name=None):
+    def decorate(func):
+        if name is None:
+            @wraps(func)
+            def wrapper(data, *arg, **kw):
+                return func(schema.validate(data, *arg, **kw))
+        else:
+            # TODO: Implement calling the function with validation done for the
+            #       given named argument.
+            raise NotImplementedError
+        return wrapper
+    return decorate

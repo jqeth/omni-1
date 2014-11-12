@@ -25,7 +25,7 @@ See 'omni help <command>' for more information on a specific command.
 """
 
 from .metadata import metadata
-from . import app, config
+from . import app, valid
 from six import iteritems, print_
 import wcfg
 
@@ -92,12 +92,10 @@ def cmd_change_password(omni_app, realm_or_store, username, opt_stdin=False):
     db.set_password(username, new_pw)
 
 
-@config.schema
-def config_http_schema():
-    return {
-        config.Optional("host"): config.NetworkAddress,
-        config.Optional("port"): config.PortNumber,
-    }
+config_http_schema = valid.Schema({
+    valid.Optional("host"): valid.NetworkAddress,
+    valid.Optional("port"): valid.PortNumber,
+})
 
 
 def cmd_server(omni_config, http_port=None, http_host=None):
@@ -209,7 +207,7 @@ def main():
     except wcfg.ParseError as e:
         raise SystemExit("error parsing config file:\n{s}:{!s}"
                 .format(args.opt_config, e))
-    except config.SchemaError as e:
+    except valid.SchemaError as e:
         raise SystemExit("configuration file validation error:\n{!s}"
                 .format(e))
 

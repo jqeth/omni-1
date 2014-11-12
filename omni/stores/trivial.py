@@ -21,8 +21,8 @@ Configuration options
     Password for the user.
 """
 
-from .. import store
-from .. import config
+from .. import store, valid
+
 
 class TrivialStore(store.Base):
     readonly = False
@@ -43,14 +43,12 @@ class TrivialStore(store.Base):
         self._credentials = (username, password)
 
 
-@config.schema
-def config_schema():
-    return {
-        "username": config.Identifier,
-        config.Optional("password"): config.Password,
-    }
+config_schema = valid.Schema({
+    "username": valid.Identifier,
+    valid.Optional("password"): valid.Password,
+})
 
 
+@valid.argument(config_schema)
 def from_config(config):
-    config = config_schema.validate(config)
     return TrivialStore(config["username"], config.get("password", ""))

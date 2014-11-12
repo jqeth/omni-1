@@ -11,15 +11,13 @@ Command line entry point for the OMNI daemon.
 """
 
 from six import iteritems, string_types, text_type
-from . import store, config
+from . import store, valid
 
 
-@config.schema
-def config_realms_schema():
-    return {
-        "methods": [config.DotIdentifier],
-        config.Optional("description"): config.Text,
-    }
+config_realms_schema = valid.Schema({
+    "methods": [valid.DotIdentifier],
+    valid.Optional("description"): valid.Text,
+})
 
 
 def load_config(path):
@@ -35,16 +33,16 @@ def make_application(omni_config):
         store_module = store.find(store_type)
         try:
             store_config = store_module.config_schema.validate(store_config)
-        except config.SchemaError as e:
-            raise config.SchemaError((), "in 'stores' section, item '{}': {!s}"
+        except valid.SchemaError as e:
+            raise valid.SchemaError((), "in 'stores' section, item '{}': {!s}"
                     .format(name, e))
         app.add_store(name, store_module.from_config(store_config))
 
     for name, realm_config in iteritems(omni_config.get("realms", {})):
         try:
             realm_config = config_realms_schema.validate(realm_config)
-        except config.SchemaError as e:
-            raise config.SchemaError((), "in 'realms' section: {!s}"
+        except valid.SchemaError as e:
+            raise valid.SchemaError((), "in 'realms' section: {!s}"
                     .format(e))
 
         methods = realm_config["methods"]
@@ -52,7 +50,7 @@ def make_application(omni_config):
             realm = store.Realm(realm_config.get("description", name),
                     (app.get_store(name) for name in methods))
         except KeyError as e:
-            raise config.SchemaError((), ("in 'realms' section, item '{s}':"
+            raise valid.SchemaError((), ("in 'realms' section, item '{s}':"
                 " undefined store '{!s}'").format(name, e))
         app.add_realm(name, realm)
 
