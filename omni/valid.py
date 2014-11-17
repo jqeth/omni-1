@@ -47,11 +47,14 @@ def Match(regexp, flags=0):
     return f
 
 
-Password       = text_type
+Password       = Use(text_type)
 Text           = And(text_type, len)
-Identifier     = And(text_type, Match(r"^\w+$"), error="Invalid identifier")
-DotIdentifier  = And(text_type, Match(r"^[\w\.]+$"), error="Invalid identifier")
-Path           = And(Or(text_type, *string_types), Use(path.realpath), error="Invalid path")
+Identifier     = And(text_type, Match(r"^[_a-zA-Z]\w*$"),
+                     error="Invalid identifier")
+DotIdentifier  = And(text_type, Match(r"^[_\.a-zA-Z][\w\.]*$"),
+                     error="Invalid identifier")
+Path           = And(Or(text_type, *string_types), Use(path.realpath),
+                     error="Invalid path")
 Number         = Use(int)
 NaturalNumber  = And(Number, lambda v: v >= 0, error="Not a positive number")
 PortNumber     = And(Number, lambda v: 0 < v <= 65535)
