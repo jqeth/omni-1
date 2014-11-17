@@ -1,6 +1,10 @@
 .. image:: https://raw.githubusercontent.com/aperezdc/omni/master/assets/omni-logo-full.png
    :alt: OMNI
 
+.. image:: https://readthedocs.org/projects/omni/badge/?version=latest
+   :target: https://readthedocs.org/projects/omni/?badge=latest
+   :alt: Documentation Status
+
 Installation
 ============
 
@@ -14,10 +18,16 @@ directly from the Git repository::
 
   pip install -e git://github.com/aperezdc/omni
 
-Configuration
+Documentation
 =============
 
-.. TODO
+The documetation for OMNI is available at:
+
+  http://omni.readthedocs.org/en/latest/
+
+.. important:: Note that the documentation is work-in-progress and
+               for the moment it is lacking a lot of content.
+
 
 Development
 ===========
