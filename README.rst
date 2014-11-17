@@ -2,7 +2,7 @@
    :alt: OMNI
 
 .. image:: https://readthedocs.org/projects/omni/badge/?version=latest
-   :target: https://readthedocs.org/projects/omni/?badge=latest
+   :target: https://omni.readthedocs.org/en/latest
    :alt: Documentation Status
 
 Installation
