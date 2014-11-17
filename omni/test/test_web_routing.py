@@ -10,7 +10,7 @@ from ..web import routing
 from .. import valid
 from webob import Request
 from webob.exc import HTTPNotFound, HTTPMethodNotAllowed
-from six import iteritems
+from six import iteritems, u
 import unittest
 
 
@@ -76,7 +76,7 @@ class TestRoute(unittest.TestCase):
             v = self.r.validate_url(url)
             self.assertTrue(isinstance(v, dict))
             self.assertTrue("variable" in v)
-            self.assertEqual(unicode(expected), v["variable"])
+            self.assertEqual(u(expected), v["variable"])
 
     def test_route_validate_invalid_data(self):
         invalid_data = (
@@ -137,7 +137,7 @@ class TestRouteSchemaValidation(unittest.TestCase):
             self.assertTrue(isinstance(v, dict))
             self.assertTrue("value" in v)
             self.assertEqual(value, v["value"])
-        return fname.encode("ascii", "replace"), f
+        return str(fname.encode("ascii", "replace")), f
 
     @staticmethod
     def make_test_invalid(typename, value):
@@ -154,7 +154,7 @@ class TestRouteSchemaValidation(unittest.TestCase):
                 self.assertEqual(None, v)
             except valid.SchemaError:
                 pass
-        return fname, f
+        return str(fname.encode("ascii", "replace")), f
 
     @classmethod
     def inject_test_functions(cls):
