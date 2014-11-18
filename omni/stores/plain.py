@@ -14,28 +14,56 @@ The recognized file format is line-based and compatible with a number of
 other text-based user databases. The parser is intentionally forgiving with
 unrecognized input lines.
 
-Configuration options
-=====================
+One of the goals of the store is to be interoperable with plain-text user
+files used by third-party software, so their files can be shared with OMNI.
+For example, the following configures a store which can access ``htpasswd``
+files, as typically used by web servers:
+
+.. code-block:: lighttpd
+   :linenos:
+
+    stores {
+        plain.htpasswd {
+            format "htpasswd"
+            path "/etc/httpd/htpasswd"
+        }
+    }
+
+
+**Configuration options:**
 
 ``format`` (optional)
+
     Format of the text file. Valid values are:
+
     - ``plain``: This is the default value. Passwords are stored in plain
-      form (not hashed). **Warning**: please assign permissions accordingly
-      in the file system to avoid users to eavesdrop!
+      form (not hashed).
+
+      **Warning**: please assign permissions accordingly in the file system
+      to avoid users to eavesdrop!
+
     - ``unix``: The passwords are hashed, using the configured ``method``
       to hash the passwords.
+
     - ``htpasswd``: This is an alias for ``unix`` that configures ``method``
       to be ``crypt``.
 
 ``method`` (optional)
+
     Hashing method using to store the passwords. The following values are
     valid:
+
     - ``crypt``: Use the standard Unix ``crypt(3)`` hashing, basing on the
-      DES algorithm. **Warning**: Note that this is method is old and should
-      be avoided if possible; it is mainly provided for compatibility with
-      other tools and because with Python 2.x is the only available method.
+      DES algorithm.
+
+      **Warning**: Note that this is method is old and should be avoided
+      if possible; it is mainly provided for compatibility with other tools
+      and because with Python 2.x is the only available method.
+
     - ``md5``: Use MD5 for password hashing.
+
     - ``sha256``: Use SHA256 for password hasshing.
+
     - ``sha512``: Use SHA512 for password hashing. This is the recommended
       setting.
 """

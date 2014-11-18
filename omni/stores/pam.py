@@ -7,13 +7,29 @@
 # Distributed under terms of the GPLv3 license.
 
 """
-Authenticate users using PAM.
+Authenticates users using PAM.
 
 Uses PAM (via the `simplepam <https://pypi.python.org/pypi/simplepam/>`_
-module) to authenticate users using a PAM service.
+module) to authenticate users using a PAM service. By default, the ``login``
+service will be used, which typically authenticates user accounts for the
+local machine. You may want to use the ``service`` option to change this:
 
-Configuration options
-=====================
+.. code-block:: lighttpd
+   :linenos:
+
+    stores {
+        pam.omni {
+            service "omni"
+        }
+    }
+
+With this snippet in the configuration file, the ``/etc/pam.d/omni``
+`service definition file
+<http://www.linux-pam.org/Linux-PAM-html/sag-configuration-file.html>`__
+will be expected to be readable by OMNI.
+
+
+**Configuration options:**
 
 ``service`` (optional)
     Name of the PAM service used to perform authentication. If not provided
@@ -23,7 +39,7 @@ Configuration options
     Users with an UID smaller that this value will not be useable. This is
     typically used to hide special system users from user listings. The
     default value is `1000`, which is a typical value for GNU/Linux systems
-    and some *BSD systems as well.
+    and some BSD systems as well.
 """
 
 from .. import store

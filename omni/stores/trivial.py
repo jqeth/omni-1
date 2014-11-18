@@ -7,18 +7,39 @@
 # Distributed under terms of the MIT license.
 
 """
-Authenticate a single user with a fixed password.
+Authenticates a single user with a fixed password.
 
-Stores a username and password pair in memory to be checked against.
+An username and password pair is kept in memory to be checked against. A
+typical usage of this store is to provide a single user that is known only
+by OMNI; for example, to define an user with administrative privileges that
+can access the OMNI web interface without restrictions:
 
-Configuration options
-=====================
+.. code-block:: lighttpd
+   :linenos:
+
+    stores {
+        trivial.omni-admin {
+            username "baron"
+            password "redtriplane"
+        }
+
+        # Other stores...
+    }
+
+    http {
+        web {
+            admin "trivial.omni-admin"
+        }
+    }
+
+
+**Configuration options:**
 
 ``username``
     Fixed user name.
 
 ``password`` (optional)
-    Password for the user.
+    Password for the user, in plain text.
 """
 
 from .. import store, valid
