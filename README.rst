@@ -1,17 +1,21 @@
 .. image:: https://raw.githubusercontent.com/aperezdc/omni/master/assets/omni-logo-full.png
    :alt: OMNI
 
-.. raw:: html
-
-   <br>
+============================================
+Omniscient Multiple Networked Identification
+============================================
 
 .. image:: https://readthedocs.org/projects/omni/badge/?version=latest
    :target: https://omni.readthedocs.org/en/latest
    :alt: Documentation Status
 
-.. image:: https://travis-ci.org/aperezdc/omni.svg
+.. image:: https://img.shields.io/travis/aperezdc/omni.svg?style=flat
    :target: https://travis-ci.org/aperezdc/omni
    :alt: Build Status
+
+.. image:: https://img.shields.io/coveralls/aperezdc/omni/master.svg?style=flat
+   :target: https://coveralls.io/r/aperezdc/omni?branch=master
+   :alt: Code Coverage
 
 
 Installation
