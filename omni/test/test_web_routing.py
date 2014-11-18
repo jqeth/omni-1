@@ -15,7 +15,8 @@ import unittest
 import re
 
 sanitize_ident_re_sub = re.compile(r"[^_a-zA-Z0-9]").sub
-sanitize_ident = lambda v: sanitize_ident_re_sub("_", v)
+sanitize_ident = lambda v: \
+        str(sanitize_ident_re_sub("_", v).encode("ascii", "replace"))
 
 
 class TestCamelCaseConverter(unittest.TestCase):
@@ -132,7 +133,7 @@ class TestRouteSchemaValidation(unittest.TestCase):
 
     @staticmethod
     def make_test_valid(typename, value):
-        fname = "test_valid_{}_{!s}".format(typename, value)
+        fname = u"test_valid_{}_{!s}".format(typename, value)
         def f(self):
             r = routing.Route(lambda *arg, **kw: None,
                     u"item/{{value:{}}}".format(typename),
@@ -145,7 +146,7 @@ class TestRouteSchemaValidation(unittest.TestCase):
 
     @staticmethod
     def make_test_invalid(typename, value):
-        fname = "test_invalid_{}_{!s}".format(typename, value)
+        fname = u"test_invalid_{}_{!s}".format(typename, value)
         def f(self):
             r = routing.Route(lambda *arg, **kw: None,
                     u"item/{{value:{}}}".format(typename),
