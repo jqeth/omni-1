@@ -9,7 +9,7 @@ Requirements:
 	six>=1.8.0
 	wcfg>=4
 	docopt>=0.6.2
-	schema=>0.3.1
+	schema>=0.3.1
 	WebOb>=1.4
 	aiowsgi>=0.3
 Extra-Requirements:

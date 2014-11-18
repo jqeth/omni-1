@@ -9,6 +9,7 @@
 from codecs import open
 from email import parser, message
 from os import path
+from re import match
 
 
 class Metadata(message.Message, object):
