@@ -1,9 +1,18 @@
 .. image:: https://raw.githubusercontent.com/aperezdc/omni/master/assets/omni-logo-full.png
    :alt: OMNI
 
+.. raw:: html
+
+   <br>
+
 .. image:: https://readthedocs.org/projects/omni/badge/?version=latest
    :target: https://omni.readthedocs.org/en/latest
    :alt: Documentation Status
+
+.. image:: https://travis-ci.org/aperezdc/omni.svg
+   :target: https://travis-ci.org/aperezdc/omni
+   :alt: Build Status
+
 
 Installation
 ============
