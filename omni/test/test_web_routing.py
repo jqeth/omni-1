@@ -10,8 +10,12 @@ from ..web import routing
 from .. import valid
 from webob import Request
 from webob.exc import HTTPNotFound, HTTPMethodNotAllowed
-from six import iteritems, u
+from six import iteritems
 import unittest
+import re
+
+sanitize_ident_re_sub = re.compile(r"[^_a-zA-Z0-9]").sub
+sanitize_ident = lambda v: sanitize_ident_re_sub("_", v)
 
 
 class TestCamelCaseConverter(unittest.TestCase):
@@ -67,16 +71,16 @@ class TestRoute(unittest.TestCase):
     def test_route_validate_valid_data(self):
         valid_data = (
             u"VAR",  # Unicode string.
-            "FOO",   # Normal string should be converted to Unicode.
-            "a_b",   # Underscores should work.
-            "_123",  # Also, numbers preceded with underscores.
+            u"FOO",  # Normal string should be converted to Unicode.
+            u"a_b",  # Underscores should work.
+            u"_123", # Also, numbers preceded with underscores.
         )
         for expected in valid_data:
             url = u"static/{}/morestatic".format(expected)
             v = self.r.validate_url(url)
             self.assertTrue(isinstance(v, dict))
             self.assertTrue("variable" in v)
-            self.assertEqual(u(expected), v["variable"])
+            self.assertEqual(expected, v["variable"])
 
     def test_route_validate_invalid_data(self):
         invalid_data = (
@@ -128,7 +132,7 @@ class TestRouteSchemaValidation(unittest.TestCase):
 
     @staticmethod
     def make_test_valid(typename, value):
-        fname = u"test_valid_{}_{!s}".format(typename, value)
+        fname = "test_valid_{}_{!s}".format(typename, value)
         def f(self):
             r = routing.Route(lambda *arg, **kw: None,
                     u"item/{{value:{}}}".format(typename),
@@ -137,7 +141,7 @@ class TestRouteSchemaValidation(unittest.TestCase):
             self.assertTrue(isinstance(v, dict))
             self.assertTrue("value" in v)
             self.assertEqual(value, v["value"])
-        return str(fname.encode("ascii", "replace")), f
+        return sanitize_ident(fname), f
 
     @staticmethod
     def make_test_invalid(typename, value):
@@ -154,7 +158,7 @@ class TestRouteSchemaValidation(unittest.TestCase):
                 self.assertEqual(None, v)
             except valid.SchemaError:
                 pass
-        return str(fname.encode("ascii", "replace")), f
+        return sanitize_ident(fname), f
 
     @classmethod
     def inject_test_functions(cls):
