@@ -173,7 +173,7 @@ TestRouteSchemaValidation.inject_test_functions()
 
 
 
-class TestableResource(routing.Resource):
+class TestableResource(routing.Routes, routing.Dispatcher):
 
     @routing.get("get/{variable}")
     def get_variable(self, request, variable):
@@ -256,11 +256,11 @@ class TestResource(unittest.TestCase):
 TestResource.inject_test_functions()
 
 
-class InferNameOfView(routing.Resource):
+class InferNameOfView(routing.View):
     pass
 
 
-class OverrideTemplateNameOfView(routing.Resource):
+class OverrideTemplateNameOfView(routing.View):
     template = "overriden"
 
 

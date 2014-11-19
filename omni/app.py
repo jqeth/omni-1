@@ -66,7 +66,7 @@ def make_wsgi_application(app_or_config):
         app_or_config = make_application(app_or_config)
 
     assert isinstance(app_or_config, store.OMNI)
-    return restish.Router(app_or_config)
+    return restish.Restish(app_or_config).dispatch_wsgi
 
 
 class uWSGIApplication(object):
