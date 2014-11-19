@@ -116,7 +116,7 @@ def parse_route_template(template):
     fbuilder.append(template[position:])
 
     return (valid.Schema(schema),
-            re.compile("".join(rbuilder)),
+            re.compile(u"".join(rbuilder)),
             u"".join(fbuilder).format)
 
 
