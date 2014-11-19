@@ -98,14 +98,15 @@ config_http_schema = valid.Schema({
 })
 
 
-def cmd_server(omni_config, http_port=None, http_host=None):
+def cmd_server(omni_config, http_port=None, http_host=None, debugger=False):
     """
-    Usage: omni server [--http-port=PORT --http-host=HOST]
+    Usage: omni server [--http-port=PORT] [--http-host=HOST] [--debugger]
 
     Options:
 
       -p, --http-port=PORT  Port in which to serve HTTP requests.
       --http-host=HOST      Host name of IP address to bind to.
+      --debugger            Enable the debugger [default: False].
 
       -h, --help            Show this help message.
     """
@@ -123,7 +124,21 @@ def cmd_server(omni_config, http_port=None, http_host=None):
         if http_port is None:
             http_port = http_config["port"]
 
-    wsgi_app = app.make_wsgi_application(omni_config)
+    omni = app.make_application(omni_config)
+    wsgi_app = app.make_wsgi_application(omni)
+
+    if debugger:
+        from backlash import DebuggedApplication
+        from webob import Request
+        import logging
+        logging.basicConfig()
+        def getctx(e=None):
+            req = None if e is None else Request(e)
+            return { "env": e, "omni": omni, "req": req, "app": wsgi_app }
+        wsgi_app = DebuggedApplication(wsgi_app,
+                context_injectors=[getctx],
+                console_init_func=getctx)
+
     loop = asyncio.get_event_loop()
     aiowsgi.create_server(wsgi_app, loop=loop, host=http_host, port=http_port)
 
