@@ -12,7 +12,8 @@ from codecs import open
 from os import path
 import sys
 
-sys.path.append(path.abspath(path.dirname(__file__)))
+# Prefer the local version of omni.metadata
+sys.path.insert(0, path.abspath(path.dirname(__file__)))
 from omni.metadata import metadata
 
 
