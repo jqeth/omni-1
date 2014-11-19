@@ -247,7 +247,8 @@ def route(template, method="ANY", name=None):
         decorated function is used.
     """
     def partial(func):
-        return wraps(func)(Route(func, template, method, name))
+        return wraps(func)(Route(func, template, method,
+            camel_to_under(func.__name__) if name is None else name))
     return partial
 
 def get(template, *arg, **kw):
@@ -409,10 +410,8 @@ class Dispatcher(object):
 class Routes(object):
     @property
     def routes(self):
-        for name, r in inspect.getmembers(self,
+        for _, r in inspect.getmembers(self,
                 lambda r: isinstance(r, Route)):
-            if r.name is None:
-                r.name = camel_to_under(name)
             yield r
 
 
