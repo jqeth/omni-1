@@ -58,7 +58,7 @@ def make_application(omni_config):
 
 
 def make_wsgi_application(app_or_config):
-    from omni import restish
+    from omni.httpserver import WSGIApplication
 
     if not isinstance(app_or_config, store.OMNI):
         if isinstance(app_or_config, string_types + (text_type,)):
@@ -66,7 +66,7 @@ def make_wsgi_application(app_or_config):
         app_or_config = make_application(app_or_config)
 
     assert isinstance(app_or_config, store.OMNI)
-    return restish.Restish(app_or_config).dispatch_wsgi
+    return WSGIApplication(app_or_config)
 
 
 class uWSGIApplication(object):
