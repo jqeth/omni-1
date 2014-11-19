@@ -7,6 +7,7 @@
 # Distributed under terms of the GPLv3 license.
 
 from codecs import open
+from textwrap import dedent
 from email import parser, message
 from os import path
 from re import match
@@ -36,7 +37,7 @@ class Metadata(message.Message, object):
     test_requirements = property(lambda self:
             self.get_multiline(self["Test-Requirements"]))
     extra_requirements = property(lambda self:
-            self.get_sub_keyed(self["Extra-Requirements"]))
+            self.get_sub_keyed(dedent(self["Extra-Requirements"])))
     entry_points = property(lambda self:
             self.get_multiline(self["Scripts"]))
     requirements = property(lambda self:
