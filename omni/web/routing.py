@@ -304,7 +304,7 @@ def authenticate(get_realm, realm_param="realm"):
             if request.authorization:
                 password = b64decode(request.authorization[1])
                 username, password = password.decode("utf-8").split(":", 1)
-            if username is None or realm.authenticate(username, password):
+            if username is None or not realm.authenticate(username, password):
                 raise HTTPUnauthorized(headers=[
                     ("WWW-Authenticate",
                         "Basic realm=\"{}\"".format(realm.description)),
