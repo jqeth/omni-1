@@ -62,9 +62,10 @@ Module Contents
 
 from .. import valid
 from functools import wraps
+from webob.compat import text_type, bytes_
 from webob.exc import HTTPNotFound, HTTPNotAcceptable, HTTPMethodNotAllowed
-from webob.exc import HTTPUnauthorized
-from webob.dec import wsgify
+from webob.exc import HTTPUnauthorized, HTTPException
+from webob import Request, Response
 from base64 import b64decode
 import re, inspect
 
@@ -403,8 +404,33 @@ class Dispatcher(object):
             ])
         raise HTTPNotFound()
 
-    dispatch_wsgi = wsgify(dispatch_request)
-    """Dispatch requests as a WSGI application."""
+    def dispatch_wsgi(self, environ, start_response):
+        """
+        Dispatches a WSGI request.
+
+        :param environ: WSGI request environment.
+        :param start_response: WSGI response callback
+        :returns: A valid WSGI response content.
+        """
+        req = Request(environ)
+        req.response = Response()
+
+        try:
+            resp = self.dispatch_request(req)
+        except HTTPException as e:
+            resp = e
+
+        if resp is None:
+            resp = req.response
+        if isinstance(resp, text_type):
+            resp = bytes_(resp, req.charset)
+        if isinstance(resp, bytes):
+            body = resp
+            resp = req.response
+            resp.write(body)
+        if resp is not req.response:
+            resp = req.response.merge_cookies(resp)
+        return resp(environ, start_response)
 
 
 class Routes(object):
