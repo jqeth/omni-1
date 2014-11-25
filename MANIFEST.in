@@ -1,3 +1,7 @@
 include examples/*.conf
 include README.rst
 include omni/META
+include omni/web/templates/*.mustache
+include omni/web/assets/*.js
+include omni/web/assets/*.css
+include omni/web/assets/*.png
