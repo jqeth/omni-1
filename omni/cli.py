@@ -130,22 +130,26 @@ def cmd_server(omni_config, http_port=None, http_host=None, debugger=False):
     if debugger:
         from backlash import DebuggedApplication
         from webob import Request
+        from wsgiref.simple_server import make_server
         import logging
         logging.basicConfig()
+
         def getctx(e=None):
             req = None if e is None else Request(e)
             return { "env": e, "omni": omni, "req": req, "app": wsgi_app }
+
         wsgi_app = DebuggedApplication(wsgi_app,
                 context_injectors=[getctx],
                 console_init_func=getctx)
-
-    loop = asyncio.get_event_loop()
-    aiowsgi.create_server(wsgi_app, loop=loop, host=http_host, port=http_port)
-
-    try:
-        loop.run_forever()
-    except KeyboardInterrupt:
-        pass
+        make_server(http_host, http_port, wsgi_app).serve_forever()
+    else:
+        loop = asyncio.get_event_loop()
+        aiowsgi.create_server(wsgi_app, loop=loop,
+                host=http_host, port=http_port)
+        try:
+            loop.run_forever()
+        except KeyboardInterrupt:
+            pass
 
 
 class ArgBag(dict):
