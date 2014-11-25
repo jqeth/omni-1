@@ -1,0 +1,154 @@
+/*
+ * styles.css
+ * Copyright (C) 2014 Adrian Perez
+ *
+ * Distributed under terms of the GPLv3 license.
+ */
+
+/* @import url('normalize.min.css'); */
+
+html,
+button,
+input,
+select,
+textarea {
+	color: #222;;
+	text-rendering: optimizeLegibility;
+}
+
+body {
+	max-width: 800px;
+	margin: 0 auto;
+	font-size: 1.2em;
+}
+
+#omni-logo {
+	background: url(omni-header-logo.png) 15px 10px no-repeat;
+	height: 80px;
+	border-bottom: 2px solid #ddd;
+	padding-left: 250px;
+	padding-top: 5px;
+	padding-right: 15px;
+	padding-bottom: 0;
+}
+
+#omni-logo h1,
+#omni-logo h3 {
+	text-align: right;
+	padding: 0;
+	margin: 0;
+	color: #3f3f3f;
+}
+
+#omni-logo h1 {
+	font-size: 34px;
+	line-height: 36px;
+}
+
+#omni-logo h2 {
+	font-size: 14px;
+	line-height: 18px;
+}
+
+header {
+	margin-top: 2em;
+	margin-bottom: 3em;
+}
+
+footer {
+	margin-top: 4em;
+	border-top: 2px solid #ddd;
+	color: #888;
+	font-size: 80%;
+	text-align: center;
+}
+
+p.message {
+	padding: 0.75em 1em;
+	background: #afa;
+	border-radius: 4px;
+	border: 2px solid #3a3;
+	box-shadow: 0px 3px #ddd;
+}
+
+p.message.error {
+	background: #faa;
+	border-color: #a33;
+}
+
+form fieldset {
+	margin-bottom: 1em;
+	border: none;
+}
+
+form fieldset label {
+	margin: 0.2em 0;
+	padding: 0.15em 0.25em;
+	clear: both;
+	display: block;
+	float: left;
+}
+
+form fieldset input {
+	float: right;
+	display: block;
+}
+
+form input[type="submit"] {
+	text-align: center;
+	font-size: 120%;
+}
+
+form input[type="text"],
+form input[type="password"] {
+	border: 2px solid #888;
+	border-radius: 4px;
+	margin: 0.2em 0;
+	padding: 0.15em 0.25em;
+}
+
+form input[type="text"]:focus,
+form input[type="password"]:focus {
+	background: #f0f0ff;
+	border-color: #88a;
+	outline: none;
+}
+
+form input[type="submit"] {
+	background: #f0fff0;
+	border: 2px solid #464;
+	border-radius: 4px;
+	color: #353;
+	box-shadow: 0px 3px #ddd;
+	padding: 0.5em 1em;
+}
+
+form input[type="submit"]:hover,
+form input[type="submit"]:focus {
+	background: #f0fff0;
+	border-color: #020;
+	color: #020;
+	box-shadow: 0px 3px 4px #aaa;
+}
+
+form input[type="submit"]:active {
+	background-color: #eee;
+	color: #999;
+	border-color: #999;
+	box-shadow: none;
+}
+
+form.single {
+	width: 70%;
+	margin: 0 auto;
+	position: relative;
+	padding-bottom: 3em;
+}
+
+form.single input[type="submit"] {
+	display: block;
+	position: absolute;
+	right: 0.5em;
+	bottom: 0;
+}
+
