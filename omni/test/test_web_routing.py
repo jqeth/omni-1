@@ -95,6 +95,12 @@ class TestRoute(unittest.TestCase):
             v = self.r.validate_url(url)
             self.assertEqual(None, v)
 
+    def test_route_multiple_methods(self):
+        r = routing.Route(self.callback,
+                u"get-or-post/{variable}",
+                ("GET", "POST"), "testroute")
+        self.assertEqual(["GET", "POST"], sorted(r.methods))
+
 
 class TestRouteSchemaValidation(unittest.TestCase):
 
