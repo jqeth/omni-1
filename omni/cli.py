@@ -112,6 +112,8 @@ def cmd_server(omni_config, http_port=None, http_host=None, debugger=False):
     """
     from aiowsgi.compat import asyncio
     import aiowsgi
+    import logging
+    logging.basicConfig()
 
     # Apply command line overrides.
     if http_host is None or http_port is None:
@@ -131,8 +133,6 @@ def cmd_server(omni_config, http_port=None, http_host=None, debugger=False):
         from backlash import DebuggedApplication
         from webob import Request
         from wsgiref.simple_server import make_server
-        import logging
-        logging.basicConfig()
 
         def getctx(e=None):
             req = None if e is None else Request(e)
