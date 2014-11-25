@@ -425,6 +425,53 @@ class Dispatcher(object):
         for r in routes:
             self.add_route(r)
 
+    def url(self, route=None, base=None, **kw):
+        """
+        Builds an URL for a given route.
+
+        Note that `route` is not supplied, the name of the caller will
+        be used as the route name. This is provided as a shorthand for
+        those routes which want to refer to themselves.
+
+        If `base` is not supplied, if there is a local variable in the
+        frame of the caller named ``request`` which is an instance of
+        :class:`webob.Request`, it will be used as if the request was
+        passed as `base`.
+
+        :param route: Name of the route, a :class:`Route` instance, or
+            ``None``.
+        :param base: Base URL, either a string, a :class:`webob.Request`
+            instance from which to infer the base URL, or ``None``.
+        :param kw: Keyword arguments to fill-in the wildcards in the
+            route URL template.
+        :return: A string.
+        """
+        # TODO: This is potentially slow, check whether there should be
+        #       a mapping from names to routes, or some kind of caching.
+        if base is None and isinstance(route, Request):
+            base = route
+            route = None
+
+        if route is None or base is None:
+            from sys import _getframe
+            frame = _getframe(1)
+            if route is None:
+                route = frame.f_code.co_name
+            if base is None:
+                base = frame.f_locals.get("request", None)
+                if not isinstance(base, Request):
+                    base = None
+
+        if isinstance(base, Request):
+            base = base.script_name
+        if isinstance(route, Route):
+            return route.make_url(base, **kw)
+
+        for r in self.routes:
+            if r.name == route:
+                return r.make_url(base, **kw)
+        raise KeyError(route)
+
     def dispatch_request(self, request):
         """
         Dispatches a request to the known routes.
