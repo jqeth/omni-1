@@ -316,6 +316,40 @@ def authenticate(get_realm, realm_param="realm"):
     return partial
 
 
+def after(after_func, *after_arg, **after_kw):
+    """
+    Decorator that calls a function with the result of another.
+
+    Decorates a function and arranges for `after_func` to be called with
+    the return value of the decorated function. Additional arguments can
+    be passed to `after_func` by passing them to the decorator.
+
+    For example, the following can be used to automatically convert the
+    values returned by the ``generate_data()`` into JSON:
+
+    >>> import json
+    >>> @after(json.dumps)
+    >>> def generate_data():
+    ...     return { 'a': 42, 'b' }
+    ...
+    >>> generate_data()
+    '{"a":42}'
+
+    :param after_func: Function to be run after the decorated function.
+        It can be a callable object.
+    :param after_arg: Additional arguments to be passed to `after_func`.
+    :param after_kw: Additional keyword arguments to be passed to
+        `after_func`.
+    """
+    def partial(func):
+        @wraps(func)
+        def f(*arg, **kw):
+            return after_func(func(*arg, **kw),
+                    *after_arg, **after_kw)
+        return f
+    return partial
+
+
 class Dispatcher(object):
     """
     Handles dispatching of HTTP requests.
@@ -461,4 +495,5 @@ class View(Routes):
 __all__ = [
     "Route", "Dispatcher", "Routes", "View",
     "route", "get", "post", "put", "delete", "patch",
+    "after",
 ]
