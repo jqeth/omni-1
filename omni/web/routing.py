@@ -161,8 +161,9 @@ class Route(object):
                 and self.template == other.template)
 
     def __repr__(self):  # pragma: no cover
-        return "Route({!r}, {!r}, name={!r})".format(
-                self.template, self.methods, self.name)
+        return "Route({!r}, {!r}, name={!r})".format(self.template,
+                self.methods[0] if len(self.methods) == 1 else self.methods,
+                self.name)
 
     def __call__(self, request, *arg, **kw):
         """
