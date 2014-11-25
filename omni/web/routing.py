@@ -67,6 +67,7 @@ from webob.exc import HTTPNotFound, HTTPNotAcceptable, HTTPMethodNotAllowed
 from webob.exc import HTTPUnauthorized, HTTPException
 from webob import Request, Response
 from base64 import b64decode
+from six import itervalues
 import re, inspect
 
 camel_to_under_first_cap_sub = re.compile(r"(.)([A-Z][a-z]+)").sub
@@ -334,7 +335,7 @@ class Dispatcher(object):
         routes known by this dispatcher.
         """
         seen = set()
-        for _, routes in self.__route_dispatch:
+        for routes in itervalues(self.__route_dispatch):
             for r in routes:
                 if r in seen:
                     continue
