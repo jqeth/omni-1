@@ -254,23 +254,3 @@ class TestResource(unittest.TestCase):
             self.rsrc.dispatch_request(req)
 
 TestResource.inject_test_functions()
-
-
-class InferNameOfView(routing.View):
-    pass
-
-
-class OverrideTemplateNameOfView(routing.View):
-    template = "overriden"
-
-
-class TestView(unittest.TestCase):
-
-    def test_infer_template_name(self):
-        v = InferNameOfView()
-        self.assertEqual("infer_name_of", v.template)
-
-    def test_override_template_name(self):
-        v = OverrideTemplateNameOfView()
-        self.assertEqual("overriden", v.template)
-

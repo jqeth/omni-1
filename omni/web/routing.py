@@ -478,24 +478,8 @@ class Routes(object):
             yield r
 
 
-class View(Routes):
-    template = None
-
-    def __init__(self, template=None):
-        super(View, self).__init__()
-        if template is None:
-            if self.template is None:
-                t = camel_to_under(self.__class__.__name__)
-                if t.endswith("_view"):
-                    t = t[:-5]
-                self.template = t
-        else:
-            self.template = template
-
-
-
 __all__ = [
-    "Route", "Dispatcher", "Routes", "View",
+    "Route", "Dispatcher", "Routes",
     "route", "get", "post", "put", "delete", "patch",
     "after",
 ]
