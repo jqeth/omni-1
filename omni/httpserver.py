@@ -39,10 +39,14 @@ render_stache = StacheCache()
 
 
 change_pass_schema = valid.Schema({
-    "username": valid.Identifier,
-    "password-old": valid.And(valid.Password, len),
-    "password-new": valid.And(valid.Password, len),
-    "password-new-again": valid.And(valid.Password, len),
+    "username": valid.And(valid.Identifier,
+        error="Invalid user name"),
+    "password-old": valid.And(valid.Password, len,
+        error="The password cannot be empty"),
+    "password-new": valid.And(valid.Password, len,
+        error="The password cannot be empty"),
+    "password-new-again": valid.And(valid.Password, len,
+        error="The password cannot be empty"),
 })
 
 
@@ -61,6 +65,7 @@ class ChangePassword(routing.Routes):
             data["error"] = True
             try:
                 params = dict(request.POST.items())
+                data["username"] = params["username"]
                 params = change_pass_schema.validate(params)
                 if not realm.authenticate(params["username"],
                         params["password-old"]):
@@ -77,11 +82,11 @@ class ChangePassword(routing.Routes):
                     data["message"] = u"Password update successfully"
                     data["error"] = False
             except KeyError as e:
-                data["message"] = str(e)
+                data["message"] = e.message
             except valid.SchemaError as e:
-                data["message"] = str(e)
+                data["message"] = e.message
             except store.AccessError as e:
-                data["message"] = str(e)
+                data["message"] = e.message
 
         return data
 
