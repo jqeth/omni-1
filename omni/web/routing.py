@@ -455,7 +455,9 @@ class Dispatcher(object):
         except HTTPException as e:
             resp = e
 
-        if resp is None:
+        if inspect.isgenerator(resp):
+            resp = Response(app_iter=resp)
+        elif resp is None:
             resp = req.response
         if isinstance(resp, text_type):
             resp = bytes_(resp, req.charset)
