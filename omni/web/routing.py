@@ -295,6 +295,30 @@ def patch(template, *arg, **kw):
 
 
 def authenticate(get_realm, realm_param="realm"):
+    """
+    Decorate a request handler to require HTTP basic authentication.
+
+    Typical usage:
+
+    .. code-block:: python
+
+        class Authenticated(Dispatcher):
+            def obtain_realm(self):
+                return # ...
+
+            @get("/realm/{r}/{page}")
+            @authenticate(obtain_realm, "r")
+            def handle_request(self, request, page):
+                return get_page(page)
+
+    :param get_realm: Function or callable used to obtain a :class:`Realm`
+        instance. It will be passed the realm name as retrieved from the
+        `realm_param` parameter of the original function. Pass ``None`` to
+        disable inspecting the parameters of the decorated function.
+    :param realm_param: Name of the parameter which contains the name of
+        the realm to use. Note that the parameter will not be passed to the
+        decorated function.
+    """
     def partial(func):
         @wraps(func)
         def f(self, request, **kw):
@@ -481,5 +505,5 @@ class Routes(object):
 __all__ = [
     "Route", "Dispatcher", "Routes",
     "route", "get", "post", "put", "delete", "patch",
-    "after",
+    "after", "authenticate",
 ]
