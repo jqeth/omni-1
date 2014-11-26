@@ -279,3 +279,11 @@ class TestPlainStoreAuthentication(unittest.TestCase):
         s.set_password("alice", "shiny")
         self.assertFalse(s.authenticate("alice", "mirror"))
         self.assertTrue(s.authenticate("alice", "shiny"))
+
+
+NOT_A_FILE = "/tmp/this/is/a/very/long/path/to/a/nonexistent/file"
+
+class TestPlainStoreOpen(unittest.TestCase):
+    def test_open_nonexistent_file(self):
+        s = plain.from_config({ "path": NOT_A_FILE })
+        self.assertEqual([], list(s.usernames()))
