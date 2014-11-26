@@ -69,7 +69,8 @@ files, as typically used by web servers:
 """
 
 from .. import store, valid
-from six import iteritems, iterkeys
+from six import iteritems, iterkeys, StringIO
+from errno import ENOENT
 from codecs import open
 from collections import OrderedDict
 import crypt, sys
@@ -178,6 +179,13 @@ class HtpasswdFileFormat(BaseFileFormat):
         return crypt.crypt(password, salt)
 
 
+class _ContextStringIO(StringIO, object):
+    def __enter__(self):
+        return self
+    def __exit__(self, type_, value, traceback):
+        pass
+
+
 class PlainStore(store.Base):
     readonly = False
 
@@ -188,7 +196,13 @@ class PlainStore(store.Base):
         self._path = path
 
     def _open_file(self, mode):  # pragma: no cover
-        return open(self._path, mode, encoding="utf-8")
+        try:
+            return open(self._path, mode, encoding="utf-8")
+        except IOError as e:
+            if e.errno == ENOENT:
+                return _ContextStringIO("")
+            else:
+                raise e
 
     def authenticate(self, username, password):
         with self._format(self._open_file, *self._fargs) as db:
