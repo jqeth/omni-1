@@ -14,6 +14,8 @@ from six import iteritems
 
 
 class Authenticator(object):
+    readonly = True
+
     """
     Defines the basic interface for authenticating users.
     """
@@ -56,6 +58,14 @@ class Authenticator(object):
         """
         raise NotImplementedError
 
+    def create_user(self, username, **kw):
+        """
+        Creates a new user name.
+
+        :param username: Name of the user.
+        """
+        raise NotImplementedError
+
 
 class AccessError(Exception):
     """
@@ -75,6 +85,13 @@ class Realm(Authenticator, list):
         else:
             super(Realm, self).__init__(realms)
         self.description = description
+
+    @property
+    def readonly(self):
+        for a in self:
+            if not a.readonly:
+                return False
+        return True
 
     def authenticate(self, username, password):
         for a in self:
@@ -113,12 +130,31 @@ class Realm(Authenticator, list):
                 return a.get_user(username)
         raise KeyError("user {} does not exist".format(username))
 
+    def create_user(self, username, **kw):
+        for a in self:
+            if a.readonly:
+                continue
+            try:
+                return a.create_user(username, **kw)
+            except NotImplementedError:
+                pass
+        raise NotImplementedError
+
+
+
+class HasOwnMethodDescriptor(object):
+    def __init__(self, method_name):
+        self.__method_name = method_name
+
+    def __get__(self, instance, owner):
+        return getattr(owner, self.__method_name, None) is not \
+                getattr(Authenticator, self.__method_name)
+
 
 class Base(Authenticator):
     """
     Base class for authentication stores.
     """
-    readonly = True
 
 
 class OMNI(object):

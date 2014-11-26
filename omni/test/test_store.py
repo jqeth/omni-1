@@ -35,6 +35,10 @@ class TestAuthenticator(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             u = self.a.get_user("bob")
 
+    def test_authenticator_create_user(self):
+        with self.assertRaises(NotImplementedError):
+            self.a.create_user("bob")
+
 
 class _RealmBaseTest(object):
 
@@ -55,6 +59,13 @@ class _RealmBaseTest(object):
     def test_realm_get_user(self):
         with self.assertRaises(KeyError):
             u = self.r.get_user("bob")
+
+    def test_realm_create_user(self):
+        with self.assertRaises(NotImplementedError):
+            self.r.create_user("bob")
+
+    def test_realm_is_readonly(self):
+        self.assertTrue(self.r.readonly)
 
 
 class TestEmptyRealm(unittest.TestCase, _RealmBaseTest):
@@ -134,6 +145,13 @@ class TestRealm(unittest.TestCase):
         with self.assertRaises(KeyError):
             u = self.r.get_user("kenny")
 
+    def test_is_readonly(self):
+        self.assertFalse(self.r.readonly)
+
+    def test_create_user(self):
+        with self.assertRaises(NotImplementedError):
+            self.r.create_user("bob")
+
 
 class TestRealmDupUsers(TestRealm):
     def setUp(self):
@@ -153,6 +171,9 @@ class TestReadonlyStore(TestRealm):
     def test_set_password(self):
         with self.assertRaises(store.AccessError):
             self.r.set_password("bob", "blurb")
+
+    def test_is_readonly(self):
+        self.assertTrue(self.r.readonly)
 
 
 class TestOMNI(unittest.TestCase):

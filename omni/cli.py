@@ -21,6 +21,7 @@ The most commonly used commands are:
   list-stores      Lists the configured stores.
   list-realms      Lists the configured realms.
   list-users       Lists users in realm or a store.
+  create-user      Adds an user to a realm or a store.
   change-password  Changes the passform for an user.
   help             Show help about different topics.
 
@@ -74,6 +75,44 @@ def cmd_list_users(omni_app, realm_or_store):
         return sorted(omni_app.get_realm_or_store(realm_or_store).usernames())
     except KeyError:
         return "{}: invalid realm/store".format(realm_or_store)
+
+
+def cmd_create_user(omni_app, realm_or_store, username, opt_stdin=False,
+        opt_prompt_password=False):
+    """
+    Usage: omni create-user [options] <realm-or-store> <username>
+
+    Adds a new user to a realm or a store.
+
+    Options:
+
+      -p, --prompt-password  Prompt for a password.
+      -i, --stdin            Read password from standard input.
+      -h, --help             Show this help message.
+    """
+    try:
+        db = omni_app.get_realm_or_store(realm_or_store)
+    except KeyError:
+        return "{}: invalid realm/store".format(realm_or_store)
+
+    if opt_stdin:
+        from sys import stdin
+        new_pw = stdin.readline().strip()
+    elif opt_prompt_password:
+        from getpass import getpass
+        old_pw = getpass("password for {}: ".format(username))
+        new_pw = getpass("password for {} (again): ".format(username))
+        if old_pw != new_pw:
+            return "passwords do not match"
+    else:
+        # TODO: Generate passwords and report them somehow. Alternatively,
+        #       produce an activation link when we have that plug-in.
+        new_pw = "#*" + username + "*#"
+
+    try:
+        return db.create_user(username, password=new_pw)
+    except NotImplementedError:
+        return "{}: user creation not suported".format(realm_or_store)
 
 
 def cmd_try_authenticate(omni_app, realm_or_store, username):
