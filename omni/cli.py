@@ -22,6 +22,7 @@ The most commonly used commands are:
   list-realms      Lists the configured realms.
   list-users       Lists users in realm or a store.
   create-user      Adds an user to a realm or a store.
+  delete-user      Deletes an user from a realm or a store.
   change-password  Changes the passform for an user.
   help             Show help about different topics.
 
@@ -114,6 +115,27 @@ def cmd_create_user(omni_app, realm_or_store, username, opt_stdin=False,
     except NotImplementedError:
         return "{}: user creation not suported".format(realm_or_store)
 
+
+def cmd_delete_user(omni_app, realm_or_store, username):
+    """
+    Usage: omni delete-user <realm-or-store> <username>
+
+    Deletes an user from a realm or a store.
+
+    Options:
+
+      -h, --help  Show this help message.
+    """
+    try:
+        db = omni_app.get_realm_or_store(realm_or_store)
+    except KeyError:
+        return "{}: invalid realm/store".format(realm_or_store)
+    try:
+        db.delete_user(username)
+    except KeyError:
+        return "{}: unknown user".format(realm_or_store)
+    except NotImplementedError:
+        return "{}: user deletion not supported".format(realm_or_store)
 
 def cmd_try_authenticate(omni_app, realm_or_store, username):
     """
