@@ -73,8 +73,7 @@ def cmd_list_users(omni_app, realm_or_store):
     try:
         return sorted(omni_app.get_realm_or_store(realm_or_store).usernames())
     except KeyError:
-        raise SystemExit(u"not a realm or store name: {}"
-                .format(realm_or_store))
+        return "{}: invalid realm/store".format(realm_or_store)
 
 
 def cmd_try_authenticate(omni_app, realm_or_store, username):
@@ -93,8 +92,8 @@ def cmd_try_authenticate(omni_app, realm_or_store, username):
     try:
         authenticate = omni_app.get_realm_or_store(realm_or_store).authenticate
     except KeyError:
-        raise SystemExit(u"not a realm or store name: {}"
-                .format(realm_or_store))
+        return "{}: invalid realm/store".format(realm_or_store)
+
     if authenticate(username, getpass("password for {}: ".format(username))):
         return 0
     return 1
@@ -115,8 +114,7 @@ def cmd_change_password(omni_app, realm_or_store, username, opt_stdin=False):
     try:
         db = omni_app.get_realm_or_store(realm_or_store)
     except KeyError:
-        raise SystemExit(u"not a realm or store name: {}"
-                .format(realm_or_store))
+        return "{}: invalid realm/store".format(realm_or_store)
 
     if opt_stdin:
         from sys import stdin
@@ -215,11 +213,10 @@ def cmd_help(commands, topics, topic):
 
     command = globals().get("cmd_" + topic.replace("-", "_"), None)
     if command is None:
-        raise SystemExit(u"topic or command does not exist: {}"
-                .format(topic))
+        return "topic or command does not exist: {}".format(topic)
 
-    from docopt import docopt
-    docopt(dedent(command.__doc__), argv=[topic, "--help"])
+    from docopt import docopt as do_docopt
+    do_docopt(dedent(command.__doc__), argv=[topic, "--help"])
 
 
 class ArgBag(dict):
