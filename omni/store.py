@@ -10,6 +10,7 @@
 Credential store definition and related utilities.
 """
 from inspect import isgenerator
+from six import iteritems
 
 
 class Authenticator(object):
@@ -154,6 +155,21 @@ class OMNI(object):
 
     def __getitem__(self, name):
         return self._realms[name]
+
+    @property
+    def stores(self):
+        """
+        Provides an iterator over `(name, store)` pairs.
+        """
+        return iteritems(self._stores)
+
+    @property
+    def realms(self):
+        """
+        Provides an iterator over `(name, realm)` pairs.
+        """
+        return iteritems(self._realms)
+
 
 
 def find(storename):
