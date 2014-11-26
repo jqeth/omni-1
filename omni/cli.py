@@ -22,6 +22,7 @@ The most commonly used commands are:
   list-realms      Lists the configured realms.
   list-users       Lists users in realm or a store.
   change-password  Changes the passform for an user.
+  help             Show help about different topics.
 
 See 'omni help <command>' for more information on a specific command.
 """
@@ -29,6 +30,7 @@ See 'omni help <command>' for more information on a specific command.
 from .metadata import metadata
 from . import app, valid
 from six import iteritems, print_
+from textwrap import dedent
 import wcfg
 
 
@@ -193,13 +195,39 @@ def cmd_server(omni_config, http_port=None, http_host=None, debugger=False):
             pass
 
 
+def cmd_help(commands, topics, topic):
+    """
+    Usage: omni help (topics | commands | <topic>)
+
+    Shows information about a commands or about a help topic.
+
+    Options:
+
+      -h, --help  Show this help message.
+
+    """
+    if topics:
+        return 0
+    if commands:
+        return sorted((k[4:].replace("_", "-")
+            for k, v in iteritems(globals())
+            if k != "cmd_help" and k.startswith("cmd_") and callable(v)))
+
+    command = globals().get("cmd_" + topic.replace("-", "_"), None)
+    if command is None:
+        raise SystemExit(u"topic or command does not exist: {}"
+                .format(topic))
+
+    from docopt import docopt
+    docopt(dedent(command.__doc__), argv=[topic, "--help"])
+
+
 class ArgBag(dict):
     def __getattr__(self, name):
         return self[name]
 
 def docopt(doc, *args, **kwarg):
     from docopt import docopt as do_docopt
-    from textwrap import dedent
 
     args = do_docopt(dedent(doc), *args, **kwarg)
     result = ArgBag()
