@@ -40,7 +40,11 @@ def cmd_list_users(omni_app, realm_or_store):
 
       -h, --help  Show this help message.
     """
-    return sorted(omni_app.get_realm_or_store(realm_or_store).usernames())
+    try:
+        return sorted(omni_app.get_realm_or_store(realm_or_store).usernames())
+    except KeyError:
+        raise SystemExit(u"not a realm or store name: {}"
+                .format(realm_or_store))
 
 
 def cmd_try_authenticate(omni_app, realm_or_store, username):
@@ -56,7 +60,11 @@ def cmd_try_authenticate(omni_app, realm_or_store, username):
       -h, --help  Show this help message.
     """
     from getpass import getpass
-    authenticate = omni_app.get_realm_or_store(realm_or_store).authenticate
+    try:
+        authenticate = omni_app.get_realm_or_store(realm_or_store).authenticate
+    except KeyError:
+        raise SystemExit(u"not a realm or store name: {}"
+                .format(realm_or_store))
     if authenticate(username, getpass("password for {}: ".format(username))):
         return 0
     return 1
@@ -74,7 +82,12 @@ def cmd_change_password(omni_app, realm_or_store, username, opt_stdin=False):
       -h, --help   Show this help message.
     """
     from getpass import getpass
-    db = omni_app.get_realm_or_store(realm_or_store)
+    try:
+        db = omni_app.get_realm_or_store(realm_or_store)
+    except KeyError:
+        raise SystemExit(u"not a realm or store name: {}"
+                .format(realm_or_store))
+
     if opt_stdin:
         from sys import stdin
         old_pw = stdin.readline().strip()
