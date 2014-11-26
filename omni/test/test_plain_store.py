@@ -287,6 +287,18 @@ class TestPlainStoreAuthentication(unittest.TestCase):
         self.assertTrue(s.has_user("peter"))
         self.assertTrue(s.authenticate("peter", "p3t3r"))
 
+    def test_delete_user(self):
+        s = TestablePlainStore(self.plain_data, "path/to/file",
+                plain.PlainFileFormat)
+        s.delete_user("bob")
+        self.assertFalse(s.has_user("bob"))
+
+    def test_delete_nonexisting_user(self):
+        s = TestablePlainStore(self.plain_data, "path/to/file",
+                plain.PlainFileFormat)
+        with self.assertRaises(KeyError):
+            s.delete_user("peter")
+
     def test_create_existing_user(self):
         s = TestablePlainStore(self.plain_data, "path/to/file",
                 plain.PlainFileFormat)

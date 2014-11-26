@@ -66,6 +66,14 @@ class Authenticator(object):
         """
         raise NotImplementedError
 
+    def delete_user(self, username):
+        """
+        Deletes an user.
+
+        :param username: Name of the user.
+        """
+        raise NotImplementedError
+
 
 class AccessError(Exception):
     """
@@ -140,15 +148,15 @@ class Realm(Authenticator, list):
                 pass
         raise NotImplementedError
 
-
-
-class HasOwnMethodDescriptor(object):
-    def __init__(self, method_name):
-        self.__method_name = method_name
-
-    def __get__(self, instance, owner):
-        return getattr(owner, self.__method_name, None) is not \
-                getattr(Authenticator, self.__method_name)
+    def delete_user(self, username):
+        for a in self:
+            if a.readonly:
+                continue
+            try:
+                return a.delete_user(username)
+            except NotImplementedError:
+                pass
+        raise NotImplementedError
 
 
 class Base(Authenticator):

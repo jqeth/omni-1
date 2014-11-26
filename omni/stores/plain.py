@@ -236,6 +236,10 @@ class PlainStore(store.Base):
         with self._format(self._open_file, *self._fargs) as db:
             db.add(username, password, serialize_info(kw) if kw else None)
 
+    def delete_user(self, username):
+        with self._format(self._open_file, *self._fargs) as db:
+            db.delete(username)
+
 
 config_schema = valid.Schema({
     "path": valid.Path,

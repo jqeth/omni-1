@@ -39,6 +39,10 @@ class TestAuthenticator(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             self.a.create_user("bob", "b0b")
 
+    def test_authenticator_delete_user(self):
+        with self.assertRaises(NotImplementedError):
+            self.a.delete_user("bob")
+
 
 class _RealmBaseTest(object):
 
@@ -63,6 +67,10 @@ class _RealmBaseTest(object):
     def test_realm_create_user(self):
         with self.assertRaises(NotImplementedError):
             self.r.create_user("bob", "b0b")
+
+    def test_realm_delete_user(self):
+        with self.assertRaises(NotImplementedError):
+            self.r.delete_user("bob")
 
     def test_realm_is_readonly(self):
         self.assertTrue(self.r.readonly)
@@ -90,9 +98,23 @@ class DummyStore(store.Base):
         raise KeyError(username)
 
 
+class WritableDummyStore(DummyStore):
+    readonly = False
+
+
 class TestRealmWithEmptyAuthenticator(unittest.TestCase, _RealmBaseTest):
     def setUp(self):
         self.r = store.Realm("test realm", DummyStore())
+
+
+class TestRealmWithEmptyWritableAuthenticators(unittest.TestCase,
+        _RealmBaseTest):
+    def setUp(self):
+        self.r = store.Realm("test realm", DummyStore(),
+                WritableDummyStore())
+
+    def test_realm_is_readonly(self):
+        self.assertFalse(self.r.readonly)
 
 
 class TestRealm(unittest.TestCase):
