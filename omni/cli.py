@@ -18,6 +18,8 @@ Options:
 The most commonly used commands are:
 
   server           Starts the OMNI server.
+  list-stores      Lists the configured stores.
+  list-realms      Lists the configured realms.
   list-users       Lists users in realm or a store.
   change-password  Changes the passform for an user.
 
@@ -28,6 +30,32 @@ from .metadata import metadata
 from . import app, valid
 from six import iteritems, print_
 import wcfg
+
+
+def cmd_list_stores(omni_app):
+    """
+    Usage: omni list-stores
+
+    Shows a list of configured stores.
+
+    Options:
+
+      -h, --help  Show this help message.
+    """
+    return sorted((name for name, _ in omni_app.stores))
+
+
+def cmd_list_realms(omni_app):
+    """
+    Usage: omni list-realms
+
+    Shows a list of configured realms.
+
+    Options:
+
+      -h, --help  Show this help message.
+    """
+    return sorted((name for name, _ in omni_app.realms))
 
 
 def cmd_list_users(omni_app, realm_or_store):
