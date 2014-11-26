@@ -73,6 +73,8 @@ from six import iteritems, iterkeys, StringIO
 from errno import ENOENT
 from codecs import open
 from collections import OrderedDict
+from base64 import b64encode, b64decode
+from six.moves.cPickle import loads as unpickle, dumps as pickle
 import crypt, sys
 
 _crypt_methods = {}
@@ -102,6 +104,16 @@ if sys.version_info.major == 2:  # pragma: no cover
         return _compare_digest_base(a, b)
 else:  # pragma: no cover
     from hmac import compare_digest
+
+
+def serialize_info(value):
+    return "p" + str(b64encode(pickle(value)))
+
+
+def unserialize_info(data):
+    if data[0] == "p":
+        return unpickle(b64decode(data[1:]))
+    return data
 
 
 class BaseFileFormat(object):
@@ -219,6 +231,10 @@ class PlainStore(store.Base):
             if username not in db:
                 raise KeyError("invalid username {}".format(username))
             db[username] = db.crypt_password(username, password)
+
+    def create_user(self, username, password, **kw):
+        with self._format(self._open_file, *self._fargs) as db:
+            db.add(username, password, serialize_info(kw) if kw else None)
 
 
 config_schema = valid.Schema({

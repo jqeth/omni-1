@@ -280,6 +280,25 @@ class TestPlainStoreAuthentication(unittest.TestCase):
         self.assertFalse(s.authenticate("alice", "mirror"))
         self.assertTrue(s.authenticate("alice", "shiny"))
 
+    def test_create_user(self):
+        s = TestablePlainStore(self.plain_data, "path/to/file",
+                plain.PlainFileFormat)
+        s.create_user("peter", "p3t3r")
+        self.assertTrue(s.has_user("peter"))
+        self.assertTrue(s.authenticate("peter", "p3t3r"))
+
+    def test_create_existing_user(self):
+        s = TestablePlainStore(self.plain_data, "path/to/file",
+                plain.PlainFileFormat)
+        with self.assertRaises(KeyError):
+            s.create_user("bob", "b0b")
+
+    def test_create_user_with_extrainfo(self):
+        s = TestablePlainStore("", "path/to/file",
+                plain.PlainFileFormat)
+        s.create_user("bob", "b0b", role="manager")
+        self.assertTrue(s.last_io.data.startswith("bob:b0b:"))
+
 
 NOT_A_FILE = "/tmp/this/is/a/very/long/path/to/a/nonexistent/file"
 

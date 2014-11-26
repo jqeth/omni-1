@@ -58,7 +58,7 @@ class Authenticator(object):
         """
         raise NotImplementedError
 
-    def create_user(self, username, **kw):
+    def create_user(self, username, password, **kw):
         """
         Creates a new user name.
 
@@ -130,12 +130,12 @@ class Realm(Authenticator, list):
                 return a.get_user(username)
         raise KeyError("user {} does not exist".format(username))
 
-    def create_user(self, username, **kw):
+    def create_user(self, username, password, **kw):
         for a in self:
             if a.readonly:
                 continue
             try:
-                return a.create_user(username, **kw)
+                return a.create_user(username, password, **kw)
             except NotImplementedError:
                 pass
         raise NotImplementedError

@@ -37,7 +37,7 @@ class TestAuthenticator(unittest.TestCase):
 
     def test_authenticator_create_user(self):
         with self.assertRaises(NotImplementedError):
-            self.a.create_user("bob")
+            self.a.create_user("bob", "b0b")
 
 
 class _RealmBaseTest(object):
@@ -62,7 +62,7 @@ class _RealmBaseTest(object):
 
     def test_realm_create_user(self):
         with self.assertRaises(NotImplementedError):
-            self.r.create_user("bob")
+            self.r.create_user("bob", "b0b")
 
     def test_realm_is_readonly(self):
         self.assertTrue(self.r.readonly)
@@ -150,7 +150,7 @@ class TestRealm(unittest.TestCase):
 
     def test_create_user(self):
         with self.assertRaises(NotImplementedError):
-            self.r.create_user("bob")
+            self.r.create_user("bob", "b0b")
 
 
 class TestRealmDupUsers(TestRealm):
