@@ -233,3 +233,17 @@ class TestOMNI(unittest.TestCase):
         self.o.add_realm("default", r)
         with self.assertRaises(KeyError):
             self.o.add_realm("default", r)
+
+    def test_enumerate_stores(self):
+        self.assertEqual([], list(self.o.stores))
+        s = DummyStore()
+        self.o.add_store("dummy.store", s)
+        self.assertEqual([("dummy.store", s)], list(self.o.stores))
+
+    def test_enumerate_realms(self):
+        self.assertEqual([], list(self.o.realms))
+        s = DummyStore()
+        self.o.add_store("dummy.store", s)
+        r = store.Realm("default realm", s)
+        self.o.add_realm("default", r)
+        self.assertEqual([("default", r)], list(self.o.realms))
