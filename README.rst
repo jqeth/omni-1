@@ -6,7 +6,7 @@ Omniscient Multiple Networked Identification
 ============================================
 
 .. image:: https://readthedocs.org/projects/omni/badge/?version=latest
-   :target: https://omni.readthedocs.org/en/latest
+   :target: https://omni.readthedocs.io/en/latest
    :alt: Documentation Status
 
 .. image:: https://img.shields.io/travis/aperezdc/omni.svg?style=flat
